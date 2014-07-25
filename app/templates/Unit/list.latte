@@ -1,0 +1,102 @@
+{* Latte template *}
+{block banner}
+<h1 n:block=title>Útvary</h1>
+{/block}
+{block content}
+<h2>Výpis firem</h2>
+<table class='list'>
+    <tr><th>Č.</th><th>Název</th><th>IČO</th><th>DIČ</th><th>Ulice</th><th>Město</th><th>Psč</th><th>Stát</th><th>Editovat</th><th>Odstranit</th></tr>
+    <tr n:foreach="$firmy as $firma" n:class='$iterator->even ? suda:licha'> 
+	    <td>{$firma->id}</td>
+	    <td>{$firma->nazev}</td>
+	    <td>{$firma->ico}</td>
+    	    <td>{$firma->dic}</td>
+    	    <td>{$firma->ulice}</td>
+    	    <td>{$firma->mesto}</td>
+    	    <td>{$firma->psc}</td>
+    	    <td>{$firma->stat}</td>
+	    <td><a href="{link editFirma!,$firma->id}">Editovat</a></td>
+	    <td><a class='delete' href="{link deleteFirma!,$firma->id}">Odstranit</a></td>
+    </tr>
+</table>
+<form n:name=formFirma>
+    <table>
+	<tr>
+	    <td>Název firmy</td><td>Ičo firmy</td><td>Dič firmy</td><td>&nbsp;</td><td>&nbsp;</td>
+	</tr>
+	<tr>
+	    <td><input n:name="nazev"></td><td><input n:name="ico"></td><td><input n:name="dic"></td><td>&nbsp;</td><td>&nbsp;</td>
+	</tr>
+	<tr>
+	    <td>Ulice</td><td>Město</td><td>PSČ</td><td>Stát</td><td>&nbsp;</td>
+	</tr>
+	<tr>
+	    <td><input n:name="ulice"></td><td><input n:name="mesto"></td><td><input n:name="psc"></td><td><input n:name="stat"></td><td><input n:name="send"></td>
+	</tr>
+    </table>
+</form>
+    
+
+<h2>Výpis útvarů</h2>
+<table class='list'>
+    <tr><th>Č.</th><th>Název</th><th>Popis</th><th>Vytvořen</th><th>Editovat</th><th>Odstranit</th></tr>
+    <tr n:foreach="$utvary as $utvar" n:class='$iterator->even ? suda:licha'> 
+	    <td>{$utvar->id}</td>
+	    <td>{$utvar->nazev}</td>
+	    <td>{$utvar->popis}</td>
+    	    <td>{$utvar->vytvoreno|date:'H:i:s d.m.Y'}</td>
+	    <td><a href="{link editUtvar!,$utvar->id}">Editovat</a></td>
+	    <td><a class='delete' href="{link deleteUtvar!,$utvar->id}">Odstranit</a></td>
+    </tr>
+</table>
+<form n:name=formUtvar>
+    <table>
+	<tr>
+	    <td>Název útvaru</td><td>Popis</td><td>&nbsp;</td>
+	</tr>
+	<tr>
+	    <td><input n:name="nazev"></td><td><input n:name="popis"></td><td><input n:name="send"></td>
+	</tr>
+    </table>
+</form>
+    
+    
+<h2>Útvary a jejich auta</h2>
+
+<form n:name=unitCarForm>
+    <p><label n:name=utvar_id>Vyber útvar <select n:name=utvar_id /></label></p>
+    {snippet tabUnitCar}
+    <table class='list'>
+	<tr><th>Spz - auta</th><th>Firma</th><th>Typ</th><th>Značka</th><th>Popis</th></tr>
+	    <tr n:foreach="$_form[auto_id]->items as $key => $label" n:class='$iterator->even ? suda:licha'>    
+		<td><label n:name="auto_id:$key"><input n:name="auto_id:$key"> {$label}</label></td>
+		<td>{$auta[$key][firma]}</td>
+		<td>{$auta[$key][typAuta]}</td>
+		<td>{$auta[$key][znackaAuta]}</td>
+		<td>{$auta[$key][popis]}</td>
+	    </tr>
+    </table>
+    {/snippet}
+    <p><input n:name=send> - zaškrtnutá auta patří útvaru</p>
+</form>
+
+
+<script>
+{include #jsCallback, input => utvar_id, link => utvarChange}
+</script>
+
+{/block}
+
+{define #jsCallback}
+
+$('#{$control["unitCarForm"][$input]->htmlId}').on('change', function() {
+    $.nette.ajax({
+        type: 'GET',
+        url: '{link {$link}!}',
+        data: {
+            'value': $(this).val()
+        }
+    });
+});
+
+{/define}

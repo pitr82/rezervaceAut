@@ -1,0 +1,24 @@
+{* This is the welcome page, you can delete it *}
+{block banner}
+<h1 n:block=title>Hlavní stránka - rezervace aut</h1>
+{/block}
+{block prihlasovani}
+{if (!$user->loggedIn)}
+    <form n:name=signInForm class=form>
+    <table>
+    <tr class="required">
+	<td><input n:name=username></td><td><input n:name=password></td> <td><input n:name=send></td><td><input n:name=remember> &nbsp;Trvale</td>
+    </tr>
+    </table>
+    <ul class="errors" n:if="$form->hasErrors()">
+        <li n:foreach="$form->errors as $error">{$error}</li>
+    </ul>
+    </form>
+{/if}
+{/block}
+{block content}
+	<h2>Přehled rezervací automobilů na {date('d.m. Y')}</h2>
+{cache expire => '1 minutes'}
+    {control tabRezervaci}
+{/cache}
+{/block}

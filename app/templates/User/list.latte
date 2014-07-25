@@ -1,0 +1,50 @@
+{* Latte template *}
+{block banner}
+<h1 n:block=title>Uživatelé</h1>
+{/block}
+{block content}
+<h2>Výpis uživatelů</h2>
+{snippet editUser}
+<table class='list'>
+    <tr><th>Č.</th><th>Jméno</th><th>Organizace</th><th>Útvar</th><th>Login</th><th>Role</th><th>Vytvořen</th><th>&nbsp;</th><th>Poznámka</th></tr>
+    <tr n:foreach="$zamestnanci as $zamestnanec" n:class='$iterator->even ? suda:licha, $zamestnanec->povolen == 0 ? zakazan'> 
+	    <td>{$zamestnanec->id}</td>
+	    <td>{$zamestnanec->prijmeni} {$zamestnanec->jmeno}</td>
+	    <td>{$zamestnanec->firma->nazev}</td>
+	    <td>{$zamestnanec->utvar->nazev}</td>
+	    <td>{$zamestnanec->login}</td>
+    	    <td>{$zamestnanec->role}</td>   
+    	    <td>{$zamestnanec->vytvoreno|date:'H:i:s d.m.Y'}</td>
+	    <td><a class='ajax' href="{link edit!,$zamestnanec->id}">Editovat</a></td>
+	    <td>
+		{if $zamestnanec->povolen == 0}
+		    zablokován ,
+		{elseif $zamestnanec->zruseno == 1}
+		    smazán
+		{else}
+		    &nbsp;
+		{/if}
+	    </td>
+    </tr>
+</table>
+	    {*$paginator->pageCount*}<div class="navigace">{control paginator}</div>
+	    <h2> Přidej / edituj uživatele</h2>
+{control formUser}
+{/snippet}
+{/block}
+
+{block styles}
+<style>
+    .navigace { width: 900px; text-align:center; }
+    ul.pagination { display: inline-block; text-align:center; margin: 0; padding: 0; }
+
+    ul.pagination li { display:inline-block; float: left; color: #717171; background: #e9e9e9; text-decoration: none;
+			padding: 2px 4px; margin-right: 5px; border-radius: 3px; border: solid 1px #c0c0c0;
+			box-shadow: inset 0px 1px 0px rgba(255,255,255, .7), 0px 1px 3px rgba(0,0,0, .1);  
+			text-shadow: 1px 1px 0px rgba(255,255,255, 0.7);  }
+    ul.pagination li.active { font-weight: bold; -webkit-box-shadow: inset -1px 2px 5px rgba(0,0,0,0.25); -moz-box-shadow: inset -1px 2px 5px rgba(0,0,0,0.25);
+				box-shadow: inset -1px 2px 5px rgba(0,0,0,0.25); }
+    ul.pagination li.disable {  }
+    #content ul.pagination li a { color: #006aeb; box-shadow: none; background: none; }
+ </style>
+{/block}

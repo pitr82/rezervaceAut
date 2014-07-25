@@ -1,0 +1,16 @@
+{* Latte template *}
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Odstranění rezervace</title>
+</head>
+<body style="padding: 30px 0 0 0; margin: 0; font: 14px/1.65 Verdana, 'Geneva CE', lucida, sans-serif; color: #0c2f52;">
+    <div id="content">
+	<p style="font-size: 120%;">Byla Vám zrušena rezervace v {date('H:i  d.m.Y')} uživatelem: <strong>{$delUserName}</strong></p>
+	<p>V případě jakýchkoli nejasnosti se zrušením rezervace kontaktujte p./pa. <a href="mailto:{$delUserEmail}"><strong>{$delUserName}</strong></a> </p>
+	<p>Detali Vaší rezervace: <strong>{$jmeno}</strong> rezervováno od <strong>{$od|date:'H:i'}</strong>  do <strong>{$do|date:'H:i'}</strong> {$do|date:'d.m.Y'} - <strong>{$auto} - {$spz}</strong> - ZRUŠENO.</p> 
+	
+	<p style="padding-left: 460px;"> &COPY; <a href="mailto:petr.stefan@vitkovice.cz">Petr Stefan</a> 2014</p>
+    </div>
+</body>
+</html>

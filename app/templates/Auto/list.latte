@@ -1,0 +1,68 @@
+{* Latte template *}
+{block banner}
+<h1 n:block=title>Auta</h1>
+{/block}
+{block content}
+
+
+<h2>Výpis automobilů</h2>
+{snippet editAuto}
+<table class='list'>
+    <tr><th>Č.</th><th>Firma</th><th>Typ</th><th>Značka</th><th>Spz</th><th>Popis</th><th>Editovat</th><th>Odstranit</th></tr>
+    <tr n:foreach="$auta as $auto" n:class='$iterator->even ? suda:licha'> 
+	    <td>{$auto->id}</td>
+	    <td>{$auto->firma->nazev}</td>
+	    <td>{$auto->typAuta->typ}</td>
+    	    <td>{$auto->znackaAuta->znacka}</td>
+    	    <td>{$auto->spz}</td>
+    	    <td>{$auto->popis}</td>
+	    <td><a class='ajax' href="{link editAuto!,$auto->id}">Editovat</a></td>
+	    <td><a class='delete' href="{link deleteAuto!,$auto->id}">Odstranit</a></td>
+    </tr>
+</table>
+<form n:name=formAuto>
+    <table>
+	<tr>
+	    <td>Firma vlastnící automobil</td><td>Typ automobilu</td><td>Značka automobilu</td>
+	</tr>
+	<tr>
+	    <td><select n:name="firma_id" /></td><td><select n:name="typAuta_id" /></td><td><select n:name="znackaAuta_id" /></td>
+	</tr>
+	<tr>
+	    <td>SPZ automobilu</td><td>Popis automobilu</td><td>&nbsp;</td>
+	</tr>
+	<tr>
+	    <td><input n:name="spz"></td><td><input n:name="popis"><td><input n:name="send"></td>
+	</tr>
+    </table>
+</form>	   
+{/snippet}
+	    
+
+<h2>Značky automobilů</h2>
+{snippet editZnacka}
+<table class='list'>
+    <tr><th>Značka automobilu</th><th>Editovat</th><th>Odstranit</th></tr>
+    <tr n:foreach="$znacky as $znacka" n:class='$iterator->even ? suda:licha'> 
+	    <td>{$znacka->znacka}</td>
+	    <td><a class='ajax' href="{link editZnacka!,$znacka->id}">Editovat</a></td>
+	    <td><a class='delete' href="{link deleteZnacka!,$znacka->id}">Odstranit</a></td>
+    </tr>
+</table>
+{control formZnacka}
+{/snippet}
+
+
+
+<h2>Typ automobilů</h2>	 
+{snippet editType}
+<table class='list'>
+    <tr><th>Typ automobilu</th><th>Editovat</th><th>Odstranit</th></tr>
+    <tr n:foreach="$typy as $typ" n:class='$iterator->even ? suda:licha'> 
+	    <td>{$typ->typ}</td>
+	    <td><a class='ajax' href="{link editTyp!,$typ->id}">Editovat</a></td>
+	    <td><a class='delete' href="{link deleteTyp!,$typ->id}">Odstranit</a></td>
+    </tr>
+</table>
+{control formTyp}
+{/snippet}

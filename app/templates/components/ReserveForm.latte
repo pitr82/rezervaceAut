@@ -1,0 +1,159 @@
+{* Latte template *}
+<div class='blizkeRezervace background'>
+    {snippet blizkerezervace}
+    <table>
+	<tr><th colspan='2'><h3>Aktuální rezervace</h3></th></tr>
+	{var $pomDatum}
+	<tr n:foreach="$blizkeRezervace as $rezervace" n:class='$iterator->even ? suda:licha'> 
+	    <td class='datum'>
+		{if $iterator->first}
+		    {$rezervace->rezervaceDo|date:'d. m. Y'}
+		{else}
+		    {capture $aktDatum}{$rezervace->rezervaceDo|date:'d. m. Y'}{/capture}
+		    {if $pomDatum == $aktDatum}
+			&nbsp;
+		    {else}
+			{$rezervace->rezervaceDo|date:'d. m. Y'}
+		    {/if}
+		{/if}   
+		{capture $pomDatum}{$rezervace->rezervaceDo|date:'d. m. Y'}{/capture}
+	    </td>
+	    {capture $zamestnanec} {$rezervace->zamestnanec->prijmeni} {$rezervace->zamestnanec->jmeno} {/capture}
+	    <td class='rezervace'>{$rezervace->rezervaceOd|date:'H:i'} - {$rezervace->rezervaceDo|date:'H:i'}
+	    <a href="mailto:{$rezervace->zamestnanec->email}">{$zamestnanec|subStr:14}</a></td>
+	</tr>
+    </table>
+    <div class="navigace">
+    {if $paginator->pageCount > 1}
+	<ul class="pagination">
+	    {if $paginator->isFirst()}
+		<li><a class="ajax" n:href="pageUpdate! 'page' => $paginator->page + 1">Další »</a></li>
+	    {elseif !$paginator->isLast()}
+		<li><a class="ajax" n:href="pageUpdate! 'page' => $paginator->page - 1">« Předchozí</a></li>
+		<li><a class="ajax" n:href="pageUpdate! 'page' => $paginator->page + 1">Další »</a></li>
+	    {/if}
+	    {if $paginator->isLast()}
+		<li><a class="ajax" n:href="pageUpdate! 'page' => $paginator->page - 1">« Předchozí</a></li>
+	    {/if}
+	    
+	</ul>
+    {/if}
+    </div>
+    {/snippet}
+</div>	 
+    {*control zvolDatum*}
+<div class='zvolDatum'>
+    <form n:name=zvolDatum class=form>
+	<h3> Zvolte datum pro výpis rezervací</h3>
+	<input n:name=datum><input n:name=sendDatum>
+	<ul class="errors" n:if="$form->hasErrors()">
+	    <li n:foreach="$form->errors as $error">{$error}</li>
+	</ul>
+    </form>
+</div>
+<div class='reserveForm background'>
+    {snippet reserveForm}
+    {include #reserveForm}
+    {/snippet}
+</div>
+       
+
+{block styles}
+    
+    <style>
+	.send { padding-top: 20px; }
+	.zvolDatum { float: left; }
+	.reserveForm { float: left; width: 585px; clear: left; margin-right: 0; }
+	.reserveForm label { margin: 3px; padding: 0; }
+	.blizkeRezervace { float: right; margin: 10px 5px; }
+	td.datum { font-weight: bold; padding: 0 10px;}
+	td.rezervace { font-size: 70%; padding-right: 5px; }
+	.navigace { width: auto; text-align:center; margin-top: 10px; font-size: 70%;}
+	ul.pagination { display: inline-block; text-align:center; margin: 0; padding: 0; }
+
+	ul.pagination li { display:inline-block; float: left; color: #717171; background: #e9e9e9; text-decoration: none;
+			    padding: 2px 4px; margin-right: 5px; border-radius: 3px; border: solid 1px #c0c0c0;
+			    box-shadow: inset 0px 1px 0px rgba(255,255,255, .7), 0px 1px 3px rgba(0,0,0, .1);  
+			    text-shadow: 1px 1px 0px rgba(255,255,255, 0.7);  }
+	ul.pagination li.active { font-weight: bold; -webkit-box-shadow: inset -1px 2px 5px rgba(0,0,0,0.25); -moz-box-shadow: inset -1px 2px 5px rgba(0,0,0,0.25);
+				    box-shadow: inset -1px 2px 5px rgba(0,0,0,0.25); }
+	#content ul.pagination li a { color: #006aeb; box-shadow: none; background: none; }
+    </style>
+    <!--[if IE 8]>
+    <style>
+	.reserveForm td { margin: 0; padding: 0; }
+	.reserveForm label { margin: 0; padding: 0; font-size: 85%; }
+	.reserveForm label input[type='radio']{ margin-right: 5px; padding: 0; }
+    </style>
+    <![endif]-->
+{/block}
+
+{define #reserveForm}
+<form n:name=formReserve>
+	
+	{if $user->isInRole('admin')}
+	    {foreach $utvary as $utvar}
+		<h3>Auta na: {$utvar->nazev}</h3>
+		{* $autaUtvaru můžou být prázdná *}
+		{var $autaUtvaru = array()}
+		{foreach $utvar->related('utvar_auto') as $utvarAuto}
+		    {? $autaUtvaru[] = $utvarAuto->auto->id} 
+		{/foreach}
+		{* Vypíšeme jen auta, která patří do útvaru *}
+		{foreach $form[auto_id]->items as $key => $label}
+		    {if in_array($key, $autaUtvaru)}
+			<label n:name="auto_id:$key"><input n:name="auto_id:$key"> {$label}</label>
+		    {/if}
+		{/foreach}
+		{var $autaUtvaru = null}
+	    {/foreach}
+	{else}
+	    <h3>Auta dostupné pro rezervaci</h3>
+	    <div class='auta'>
+	    {if !empty($autaUtvaru)}
+	    {foreach $form[auto_id]->items as $key => $label}
+		<label n:name="auto_id:$key"><input n:name="auto_id:$key"> {$label}</label>
+	    {/foreach}
+	    {/if}
+	</div>
+	{/if}
+	<h3> Vyberte datum rezervace</h3>
+	<div class='den'>
+	    <table>
+	    <tr>
+	    {foreach $form[den]->items as $key => $label}
+		<td><label n:name="den:$key"><input n:name="den:$key"> {$label}</label></td>
+		{if $iterator->counter == 7}
+		</tr><tr>
+		{/if} 
+	    {/foreach}
+	    </tr>
+	    </table>
+	</div>
+	<h3> Vyberte si čas rezervace</h3>
+	<div class='cas'>
+	    Od <select n:name=casOd />  do<select n:name=casDo />
+	</div>
+	<div class='send'>
+	    <input n:name=send>
+	    <!--<input n:name=liveSend style="display: none;">-->
+	</div>
+    </form>
+{/define}	
+
+<script>
+    {include #jsCallback, input => den, link => formRef}
+</script>
+    
+{define #jsCallback}
+    $('input[type=radio].ajax').on('change', function() {
+	$.nette.ajax({
+	    type: 'POST',
+//		off: ['unique'],
+	    url: '?do=formRef',
+	    data: {
+		'value': $(this).val()
+	    }
+	});
+    });
+{/define}   

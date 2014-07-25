@@ -1,0 +1,22 @@
+{* Latte template *}
+{block banner}
+    <h1 n:block=title>Editace rezervace</h1>
+{/block}
+
+{block content}
+    {snippet nadpis, h2}
+    Přehled rezervací automobilů na den {$datum|date:'d. m. Y'} 
+    {/snippet}
+
+    {snippet tabRezervaci}
+	{control tabRezervaci}
+    {/snippet}
+
+
+    {include ../components/ReserveForm.latte}
+
+{/block}
+
+{block styles}
+   
+{/block}

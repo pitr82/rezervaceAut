@@ -1,0 +1,91 @@
+{* Latte template *}
+{block banner}
+<h1 n:block=title>Statistiky</h1>
+{/block}
+
+{block content}
+<h2> Souhrné statistiky</h2>
+<table class='list'>
+    <tr n:foreach="$nejPujcuje as $np" class="suda">
+	<td>Nejčastěji si auto půjčuje: </td> 
+	<td> <strong>{$np->zamestnanec->jmeno} {$np->zamestnanec->prijmeni}</strong> ({$np->counted}x).</td>
+    </tr>
+    
+    <tr n:foreach="$nejPujcAuto as $npa" class="licha">
+	<td>Nejpůjčovanější auto: </td> 
+	<td> <strong>{$npa->auto->znackaAuta->znacka} - {$npa->auto->spz}</strong> ({$npa->counted}x).</td>
+    </tr>
+    
+    <tr n:foreach="$nejdelePujcAuto as $np1" class="suda">
+	<td>Nejdéle bylo půjčeno: </td> 
+	<td> <strong>{$npa->auto->znackaAuta->znacka} - {$npa->auto->spz}</strong> ({round($np1->soucet)} hodin).</td>
+    </tr>
+</table>
+<h2> Statistiky aut</h2>
+<table class='list'>
+    <tr><th>č.</th><th>Auto</th><th>Spz</th><th>Útvar</th><th>půjčeno(x)</th><th>půjčeno (hodin)</th><th>&Oslash; půjčeno (hodin)</th></tr>
+    <tr n:foreach="$statsAuta as $auto" n:class='$iterator->even ? suda:licha'>
+	<td>{$auto['id']}</td><td>{$auto['znacka']}</td><td>{$auto['spz']}</td>
+	<td>{$auto['utvar']}</td><td>{$auto['counted']}</td><td>{round($auto['soucet'],1)}</td><td>{round($auto['soucet']/$auto['counted'],1)}</td>
+    </tr> 
+</table>
+    <h2> Statistiky jednotlivých aut za posledních {$pSloupcu} dnů</h2>
+    {foreach $utvary as $utvar}
+	<table class='list2'>  
+	    <tr><th colspan="{$pSloupcu+2}">{$utvar->nazev} </th></tr>
+	    {foreach $utvar->related('utvar_auto') as $utvarAuto}
+		{var $datumOd = new \Nette\Utils\DateTime()}
+		{? $datumOd->modify('-'.($pSloupcu-1).' DAYS')}
+		{var $sumaHodin}
+		<tr>
+		    <td class="zv">{$utvarAuto->auto->znackaAuta->znacka} <br />{$utvarAuto->auto->spz}</td>
+		    {var $sql = $utvarAuto->auto->related('rezervace')
+				->select('auto_id, DATE(rezervaceDo) AS rezervaceDo, SUM(TIMESTAMPDIFF(MINUTE, rezervaceOd, rezervaceDo)/60) AS pocet')
+				->where('rezervaceDo > NOW() - INTERVAL '.($pSloupcu-1).' DAY')
+				->where('CURDATE() >= DATE(rezervaceDo)')
+				->group('DATE(rezervaceDo)')}
+		    {foreach $sql as $rezervace}
+			{* cyklus pro vypsání nulových hodnot *}
+			{*while $datumOd->diff($rezervace->rezervaceDo)->days != 0*}
+			{while $datumOd->format('Y-m-d') != $rezervace->rezervaceDo->format('Y-m-d')}
+			    <td><strong>{$datumOd|date:'d.m'}</strong> <br />0 h</td>
+			    {* zvýšení dne pro kontrolu *}
+			    {? $datumOd->modify('+1 DAY')}
+			{/while}
+			<td><strong>{$rezervace->rezervaceDo|date:'d.m'}<br />{$rezervace->pocet}</strong> h</td>
+			    {* zvýšení dne pro kontrolu *}
+			    {? $datumOd->modify('+1 DAY')}
+			    {? $sumaHodin += $rezervace->pocet}
+		    {/foreach}
+		    {* vypsání prázdných sloupcu do aktualního data *}
+		    {var $dnes = new \Nette\Utils\DateTime()}
+		    {while $datumOd->format('Y-m-d') <= $dnes->format('Y-m-d')}
+		        <td><strong>{$datumOd|date:'d.m'}</strong> <br />0 h</td>
+			{* zvýšení dne pro kontrolu *}
+			{? $datumOd->modify('+1 DAY')}
+		    {/while}
+		    {* vypsání procent vypůjčení auta během směny -odpočet soboty neděle pSloupcu/tydnu*2  *}
+		    <td><strong>Vytížení auta na 8h směnu</strong> <br />{round(($sumaHodin*100)/(($pSloupcu-($pSloupcu/7*2))*8),2)}%</td>
+		</tr>
+		
+	    {/foreach}
+	</table>
+    {/foreach}
+    
+<h2> Statistiky zaměstnanců</h2>
+<table class='list'>
+    <tr><th>č.</th><th>Jméno</th><th>Útvar</th><th>půjčeno(x)</th><th>půjčeno (hodin)</th><th>&Oslash; půjčeno (hodin)</th></tr>
+    <tr n:foreach="$statsUziv as $uziv" n:class='$iterator->even ? suda:licha'>
+	<td>{$uziv['id']}</td><td>{$uziv['jmeno']} {$uziv['prijmeni']}</td>
+	<td>{$uziv['utvar']}</td><td>{$uziv['counted']}</td><td>{round($uziv['soucet'],1)}</td><td>{round($uziv['soucet']/$uziv['counted'],1)}</td>
+    </tr> 
+</table>
+    
+    {block styles}
+	<style>
+	    #content table.list2 { margin: 10px; border-collapse: collapse; }
+	    #content table.list2 th{ font-size: 14px; text-align: left; }
+	    #content table.list2 td{ font-size: 10px; padding-right: 10px; }   
+	    #content table.list2 td.zv{ font-size: 12px; color: #006aeb; } 
+	</style>
+    {/block}

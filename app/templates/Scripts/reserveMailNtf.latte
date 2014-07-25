@@ -1,0 +1,33 @@
+{* Latte template *}
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Za 30 minut Vám začíná rezervace</title>
+</head>
+<body style="padding: 30px 0 0 0; margin: 0; font: 14px/1.65 Verdana, 'Geneva CE', lucida, sans-serif; color: #0c2f52;">
+    <div id="content">
+	<div style="background: #0c2f52; width: 288px; height: 92px;">
+	<img src="{$basePath}/images/logo_mail.jpeg" alt="Logo Vítkovice" width="288" height="92" />
+	</div>
+	<p style="font-size: 120%;">Blíží se čas vyzvednutí Vámi rezervovaného auta</p>
+	
+	<table style="border-collapse: collapse; text-align: left; font: 14px/1.65 Verdana, 'Geneva CE', lucida, sans-serif; color: #0c2f52;">
+	    <tr style="font-size: 130%; ">
+		<th colspan="2">Rezervace č. {$id}</th> <th style="padding-left: 60px;"></th><th  colspan="2">IS Rezervace aut</th>
+	    </tr>
+	    <tr style="font-size: 80%;">
+		<td>Přijato:</td><td style="padding-left: 8px;">{$vytvoreno|date:'d.m.y'}</td><td style="padding-left: 60px;">&nbsp;</td><td style="background: #c7dcf2;">Jméno:</td><td style="background: #c7dcf2; padding-left: 8px;">{$jmeno}</td>
+	    </tr>
+	    <tr style="font-size: 80%;">
+		 <td>Auto:</td><td  style="padding-left: 8px;">{$auto}</td><td style="padding-left: 60px;">&nbsp;</td><td style="background: #c7dcf2;">Email:</td><td style="background: #c7dcf2; padding-left: 8px;">{$email}</td>
+	    </tr>
+	    <tr style="font-size: 80%;">
+		 <td>Spz:</td><td  style="padding-left: 8px;">{$spz}</td><td style="padding-left: 60px;">&nbsp;</td><td style="background: #c7dcf2;">Tel:</td><td style="background: #c7dcf2; padding-left: 8px;">{$tel}</td>
+	    </tr>
+	</table>
+		<p style="font-size: 120%;"> Rezervace od <strong style="font-size: 130%;">{$od|date:'H:i'}</strong> do <strong style="font-size: 130%;">{$do|date:'H:i'}</strong>  {$do|date:'d.m.Y'}</p>
+	<p class="info">Pokud potřebujete rezervaci upravit nebo zrušit můžete <a href="{$basePath}/reserve/list">tady</a> a to do {$od|date:'H:i'}</p>
+	<p style="padding-left: 460px;"> &COPY; <a href="mailto:petr.stefan@vitkovice.cz">Petr Stefan</a> 2014</p>
+    </div>
+</body>
+</html>

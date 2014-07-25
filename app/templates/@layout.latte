@@ -1,0 +1,115 @@
+{**
+ * My Application layout template.
+ *
+ * @param string   $basePath web base path
+ * @param string   $robots   tell robots how to index the content of a page (optional)
+ * @param array    $flashes  flash messages
+ *}
+
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="description" content="">
+	<meta name="robots" content="{$robots}" n:ifset="$robots">
+	
+	<meta http-equiv="content-language" content="cs" />
+	<meta http-equiv="cache-control" content="no-cache" />
+	<meta http-equiv="pragma" content="no-cache" />
+	<meta http-equiv="expires" content="-1" />
+
+	<title>{ifset #title}{include title|striptags} | {/ifset}IS Rezervace aut</title>
+
+	<link rel="stylesheet" media="screen,projection,tv" href="{$basePath}/css/screen.css">
+	<link rel="stylesheet" media="print" href="{$basePath}/css/print.css">
+	<link rel="shortcut icon" href="{$basePath}/favicon.ico">
+	<style>
+	    html { overflow-y: scroll; }
+	    body { font: 14px/1.65 Verdana, "Geneva CE", lucida, sans-serif; background: #3484d2; color: #333; margin: 38px auto; max-width: 940px; min-width: 770px; }
+
+	    h1, h2 { font: normal 150%/1.3 Georgia, "New York CE", utopia, serif; color: #1e5eb6; -webkit-text-stroke: 1px rgba(0,0,0,0); }
+
+	    img { border: none; }
+
+	    a { color: #006aeb; padding: 3px 1px; }
+
+	    a:hover, a:active, a:focus { background-color: #006aeb; text-decoration: none; color: white; }
+
+	    #banner { border-radius: 12px 12px 0 0; background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAB5CAMAAADPursXAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAGBQTFRFD1CRDkqFDTlmDkF1D06NDT1tDTNZDk2KEFWaDTZgDkiCDTtpDT5wDkZ/DTBVEFacEFOWD1KUDTRcDTFWDkV9DkR7DkN4DkByDTVeDC9TDThjDTxrDkeADkuIDTRbDC9SbsUaggAAAEdJREFUeNqkwYURgAAQA7DH3d3335LSKyxAYpf9vWCpnYbf01qcOdFVXc14w4BznNTjkQfsscAdU3b4wIh9fDVYc4zV8xZgAAYaCMI6vPgLAAAAAElFTkSuQmCC); }
+	    #banner a { padding: 0; text-decoration: none; }
+	    #banner h1 { color: white; font-size: 50px; line-height: 121px; margin: 0; padding-left: 40px; background: url({$basePath}/images/logo_vitkovice.png) no-repeat 95%; text-shadow: 1px 1px 0 rgba(0, 0, 0, .9); }
+	    #content { background: white; border: 1px solid #eff4f7; border-radius: 0 0 12px 12px; padding: 10px; }
+	    #content .background { background-color: #f1f7ff; border-top-left-radius: 5px;  border-top-right-radius: 5px; border-bottom-right-radius: 5px; border-bottom-left-radius: 5px; }
+	    #content > h2 { font-size: 150%; color: #003366; clear: both; padding: 1em 0; margin: 0; text-align: center;}
+	    #content a { color: #006aeb; background: #f7f7f7; padding: 1px 3px; border-radius: 3px; text-decoration: none; box-shadow: 0 2px 5px rgba(0, 0, 0, .10); }
+	    #content a:hover, .box p a:active, .box p a:focus { color: white; background-color: #006aeb; }
+	    #content a.delete {	color: red; }
+	    #content #odkazy a { border-top: 1px solid #96d1f8; background: #65a9d7; background: -webkit-gradient(linear, left top, left bottom, from(#3e779d), to(#65a9d7));
+		background: -webkit-linear-gradient(top, #0f5091, #7a9bbd); background: -moz-linear-gradient(top, #0f5091, #7a9bbd); background: -ms-linear-gradient(top, #0f5091, #7a9bbd);
+		background: -o-linear-gradient(top, #3e779d, #65a9d7); padding: 7.5px 15px; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px;
+		-webkit-box-shadow: rgba(0,0,0,1) 0 1px 0; -moz-box-shadow: rgba(0,0,0,1) 0 1px 0;  box-shadow: rgba(0,0,0,1) 0 1px 0; text-shadow: rgba(0,0,0,.4) 0 1px 0;
+		color: white; font-size: 14px; font-family: Helvetica, Arial, Sans-Serif; text-decoration: none; vertical-align: middle; }
+	    #content #odkazy a.active,#content #odkazy a:hover { border-top-color: #65a9d7; background: #0f5091; color: #ccc; }
+	    #content #prihlasovani { float:right; }
+	    #content #odkazy { float: left; }
+	    #content table.list { margin: 10px; width: 98%; border-collapse: collapse; }
+	    #content table.list th{ font-size: 14px; text-align: left; }
+	    #content table.list td{ font-size: 10px; }
+	    #content table.list tr.suda{ background-color: #e0dede; }
+	    #content table.list tr.licha{ background-color: #f5f4fb; }
+	    #content table.list tr.zakazan{ background-color: #f8d787; }
+	    
+	    h2 span { color: #87A7D5; }
+	    h2 a { text-decoration: none; background: transparent; }
+
+	    html.js section { display: none; }
+
+	    pre { font-size: 12px; line-height: 1.4; padding: 10px; margin: 1.3em 0; overflow: auto; max-height: 500px; background: #F1F5FB; border-radius: 5px; box-shadow: 0 1px 1px rgba(0, 0, 0, .1); }
+
+	    .footer { clear: both; font-size: 70%; padding: 1em 0; text-align: center; }
+	</style>
+	{block styles}{/block}
+	
+	{block scripts}
+	<script src="{$basePath}/js/jquery.js"></script>
+	<script src="{$basePath}/js/netteForms.js"></script>
+	<script src="{$basePath}/js/nette.ajax.js"></script>
+	<script src="{$basePath}/js/main.js?{=Constants::PROGRAM_VERSION}"></script>
+	{/block}
+</head>
+
+<body>
+	<script> document.documentElement.className+=' js' </script>
+	
+	<div n:foreach="$flashes as $flash" class="flash {$flash->type}">{$flash->message}</div>
+	<div id="banner"><a href="{$baseUri}">
+	    {block #banner}<h1> IS Rezervace aut</h1>{/block}
+	    </a>
+	</div>
+	<div id="content">
+	    <div id="prihlasovani">
+		<div id="logged-in" n:if="$user->loggedIn">Vítejte: {$user->identity->jmeno} {$user->identity->prijmeni} <a n:href="Homepage:out"> Odhlásit se</a></div>
+		{block prihlasovani}
+		{/block}
+	    </div>
+	    <div id="odkazy" n:if="$user->loggedIn">
+	    {block odkazy}
+	     <a n:href="Reserve:default datum => date('Y-m-d')" n:class="$presenter->islinkCurrent('Reserve:default') ? active">Rezervovat auto</a>
+	     <a n:href="Reserve:list" n:class="$presenter->linkCurrent ? active">Mé rezervace</a>
+	     <a n:href="User:list" n:class="$presenter->isLinkCurrent('User:*') ? active" n:if="$user->isInRole('admin')">Uživatelé</a>
+	     <a n:href="Unit:list" n:class="$presenter->isLinkCurrent('Unit:*') ? active" n:if="$user->isInRole('admin')">Útvary</a>
+	     <a n:href="Auto:list" n:class="$presenter->isLinkCurrent('Auto:*') ? active" n:if="$user->isInRole('admin')">Auta</a>
+	     <a n:href="Statistics: datum => null" n:class="$presenter->isLinkCurrent('Statistics:*') ? active">Statistiky</a>
+	    {/block}
+	    </div>
+	    {include content}
+	    
+	    <div class='footer'>PHP {=PHP_VERSION} |
+		    {ifset $_SERVER['SERVER_SOFTWARE']}Server {$_SERVER['SERVER_SOFTWARE']}{/ifset} |
+		    Nette Framework {=Nette\Framework::VERSION} | Verze programu {=Constants::PROGRAM_VERSION} | 
+		    <a href="{$baseUri}/help">Help/Nápověda </a>|
+		    Autor <a href="mailto:{=Constants::ADMIN_MAIL}">{=Constants::ADMIN_NAME}</a>
+	    </div>
+	</div>	
+</body>
+</html>

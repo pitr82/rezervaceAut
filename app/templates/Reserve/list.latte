@@ -1,0 +1,71 @@
+{* Latte template *}
+{block banner}
+<h1 n:block=title>Mé rezervace</h1>
+{/block}
+
+{block content}
+    <h2>Přehled rezervací - Aktuálně platných na den {$datum|date:'d. m. Y'}</h2>
+
+    {control tabRezervaci}
+    <form n:name=zvolDatum class=form>
+    <div class='zvolDatum'>
+	<h3> Zvolte datum pro výpis rezervací</h3>
+	<input n:name=datum><input n:name=sendDatum>
+	<ul class="errors" n:if="$form->hasErrors()">
+	    <li n:foreach="$form->errors as $error">{$error}</li>
+	</ul>
+    </div>
+    </form>
+    <h2>Mé naplanované rezervace {*date('H:i d.m.Y')*}</h2>
+    <table class='list'>
+	<tr><th>Č. rez.</th><th>Rezervované auto</th><th>Datum rezervace </th><th>Čas rezervace</th><th>&nbsp;</th><th>&nbsp;</th></tr>
+	{if count($aktivniRezervace)==0}
+	    <tr><td colspan='6' class='bezRezervaci'>Nemáte naplanované žádné rezervace : <a n:href="Reserve:default datum => date('Y-m-d')">Rezervovat auto ?</a></td></tr>
+	{/if}
+	<tr n:foreach="$aktivniRezervace as $rezervace" n:class='$iterator->even ? suda:licha'> 
+	    <td>{$rezervace->id}</td>
+	    <td>{$rezervace->auto->znackaAuta->znacka} {$rezervace->auto->spz}</td>
+	    <td>{$rezervace->rezervaceOd|date:'d.m. Y'}</td>
+	    <td>{$rezervace->rezervaceOd|date:'H:i'}-{$rezervace->rezervaceDo|date:'H:i'}</td>
+	    <!--<td><a href="{link delete, datum => null, $rezervace->id}">Zrušit rezervaci</a></td>-->
+	    {var $datum = explode(' ',$rezervace->rezervaceOd);}
+	    {if $user->isInRole('admin') || in_array($rezervace->auto_id, $autaUtvaru)}
+		<td><a href="{link edit, $datum[0] ,$rezervace->id}">Upravit rezervaci</a></td>
+		<td><a class="delete" href="{link delete!, $rezervace->id}">Zrušit rezervaci</a></td>
+	    {else}
+		<td colspan="2">Máte rezervované auto jiného útvaru, pro úpravy kontaktujte dispečink.</td>
+	    {/if}
+
+	</tr>
+    </table>
+{if $user->isInRole('admin')}   
+    <h2>Aktuální rezervace v systému{*date('H:i d.m.Y')*}</h2>
+    <table class='list'>
+	<tr><th>Č. rez.</th><th>Rezervované auto</th><th>Rezervoval</th><th>Datum rezervace </th><th>Čas rezervace</th><th>&nbsp;</th><th>&nbsp;</th></tr>
+	{if count($aktualniRezervace)==0}
+	    <tr><td colspan='6' class='bezRezervaci'>Nemáte naplanované žádné rezervace : <a n:href="Reserve:default datum => date('Y-m-d')">Rezervovat auto ?</a></td></tr>
+	{/if}
+	<tr n:foreach="$aktualniRezervace as $rezervace" n:class='$iterator->even ? suda:licha'> 
+	    <td>{$rezervace->id}</td>
+	    <td>{$rezervace->auto->znackaAuta->znacka} {$rezervace->auto->spz}</td>
+	    <td>{$rezervace->zamestnanec->jmeno} {$rezervace->zamestnanec->prijmeni}</td>
+	    <td>{$rezervace->rezervaceOd|date:'d.m. Y'}</td>
+	    <td>{$rezervace->rezervaceOd|date:'H:i'}-{$rezervace->rezervaceDo|date:'H:i'}</td>
+	    <!--<td><a href="{link delete, datum => null, $rezervace->id}">Zrušit rezervaci</a></td>-->
+	    {var $datum = explode(' ',$rezervace->rezervaceOd);}
+	    <td><a href="{link edit, $datum[0] ,$rezervace->id}">Upravit rezervaci</a></td>
+    	    <td><a class="delete" href="{link delete!, $rezervace->id}">Zrušit rezervaci</a></td>
+
+	</tr>
+    </table>
+{/if}
+	    
+    
+    
+{/block}
+
+{block styles}
+    <style>
+	#content table.list td.bezRezervaci { text-align: center; font-size: 100%; padding: 15px; color: #437df0; }
+    </style>
+{/block}
