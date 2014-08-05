@@ -1,4 +1,10 @@
+Aplikace rezervace aut
+=======================
+Aplikace je určena k rezervací automobilů pro firemní zaměstnance. 
 
+Aplikace IS rezervace aut  je založeno na Nette Framework 
+
+Nette Framework Sandbox
 =======================
 
 The basic skeleton of application.
