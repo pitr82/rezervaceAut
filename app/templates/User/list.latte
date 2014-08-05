@@ -3,11 +3,14 @@
 <h1 n:block=title>Uživatelé</h1>
 {/block}
 {block content}
-<h2>Výpis uživatelů</h2>
+<h2> Přidej / edituj uživatele</h2>
 {snippet editUser}
+    {control formUser}
+{/snippet}
+<h2>Výpis uživatelů</h2>
 <table class='list'>
     <tr><th>Č.</th><th>Jméno</th><th>Organizace</th><th>Útvar</th><th>Login</th><th>Role</th><th>Vytvořen</th><th>&nbsp;</th><th>Poznámka</th></tr>
-    <tr n:foreach="$zamestnanci as $zamestnanec" n:class='$iterator->even ? suda:licha, $zamestnanec->povolen == 0 ? zakazan'> 
+    <tr n:foreach="$zamestnanci as $zamestnanec" n:class="$iterator->even ? suda:licha, $zamestnanec->povolen == 0 ? zakazan, $zamestnanec->role == 'admin' ? admin "> 
 	    <td>{$zamestnanec->id}</td>
 	    <td>{$zamestnanec->prijmeni} {$zamestnanec->jmeno}</td>
 	    <td>{$zamestnanec->firma->nazev}</td>
@@ -27,10 +30,7 @@
 	    </td>
     </tr>
 </table>
-	    {*$paginator->pageCount*}<div class="navigace">{control paginator}</div>
-	    <h2> Přidej / edituj uživatele</h2>
-{control formUser}
-{/snippet}
+	    {*$paginator->pageCount*}<div class="navigace">{control paginator}</div>  
 {/block}
 
 {block styles}

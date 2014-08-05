@@ -86,6 +86,8 @@ class UnitPresenter extends SecurePresenter
         $this->template->firmy = $this->unit->vypisFirmy();
         $this->template->utvary = $this->unit->vypisUtvary();
 	$this->template->auta = $this->unit->vratPoleSAuty();
+	$this->template->autaBezUtvaru = $this->unit->autaBezUtvaru();
+	$this->template->autaNaViceUtvarech = $this->unit->autaNaViceUtvarech();
 	// required to enable form access in snippets
         $this->template->_form = $this['unitCarForm'];
     }

@@ -1,3 +1,5 @@
+Order Allow,Deny
+Allow from all
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteRule ^$ www/ [L]

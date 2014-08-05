@@ -58,6 +58,86 @@
 </div>
        
 
+
+
+{define #reserveForm}
+<form n:name=formReserve>
+	
+	{if $user->isInRole('admin')}
+	    <h3>Zadejte jiného řidiče</h3>
+	    <input n:name="jinyRidic" class="autaocomplete">
+	    {foreach $utvary as $utvar}
+		<h3>Auta na: {$utvar->nazev}</h3>
+		{* $autaUtvaru můžou být prázdná *}
+		{var $autaUtvaru = array()}
+		{foreach $utvar->related('utvar_auto') as $utvarAuto}
+		    {? $autaUtvaru[] = $utvarAuto->auto->id} 
+		{/foreach}
+		{* Vypíšeme jen auta, která patří do útvaru *}
+		<table>
+		    <tr>
+		{foreach $form[auto_id]->items as $key => $label}
+		    {if in_array($key, $autaUtvaru)}
+			<td><label n:name="auto_id:$key"><input n:name="auto_id:$key"> {$label}</label></td>
+			{default $foo = 1}
+			{if $foo%2 == 0}
+			    </tr><tr>
+			{/if} 
+			{? $foo++}
+			
+		    {/if}
+		{/foreach}
+		    </tr>
+		</table>
+		{var $autaUtvaru = null}
+	    {/foreach}
+	{else}
+	    <h3>Auta dostupné pro rezervaci</h3>
+	    <div class='auta'>
+	    {if !empty($autaUtvaru)}
+	    <table>
+		<tr>
+	    {foreach $form[auto_id]->items as $key => $label}
+		<td><label n:name="auto_id:$key"><input n:name="auto_id:$key"> {$label}</label></td>
+		{default $foo = 1}
+		{if $foo%2 == 0}
+		    </tr><tr>
+		{/if} 
+		{? $foo++}
+	    {/foreach}
+		</tr>
+	    </table>
+	    {/if}
+	</div>
+	{/if}
+	<h3> Vyberte datum rezervace</h3>
+	<div class='den'>
+	    <table>
+	    <tr>
+	    {foreach $form[den]->items as $key => $label}
+		<td><label n:name="den:$key"><input n:name="den:$key"> {$label}</label></td>
+		{if $iterator->counter == 7}
+		</tr><tr>
+		{/if} 
+	    {/foreach}
+	    </tr>
+	    </table>
+	</div>
+	<h3> Vyberte si čas rezervace</h3>
+	<div class='cas'>
+	    Od <select n:name=casOd />  do<select n:name=casDo />
+	</div>
+	<h3> Zadejte cíl cesty</h3>
+	<div class='destinace'>
+	    <input n:name="destinace">
+	</div>
+	<div class='send'>
+	    <input n:name=send>
+	    <!--<input n:name=liveSend style="display: none;">-->
+	</div>
+    </form>
+{/define}	
+
 {block styles}
     
     <style>
@@ -88,58 +168,6 @@
     <![endif]-->
 {/block}
 
-{define #reserveForm}
-<form n:name=formReserve>
-	
-	{if $user->isInRole('admin')}
-	    {foreach $utvary as $utvar}
-		<h3>Auta na: {$utvar->nazev}</h3>
-		{* $autaUtvaru můžou být prázdná *}
-		{var $autaUtvaru = array()}
-		{foreach $utvar->related('utvar_auto') as $utvarAuto}
-		    {? $autaUtvaru[] = $utvarAuto->auto->id} 
-		{/foreach}
-		{* Vypíšeme jen auta, která patří do útvaru *}
-		{foreach $form[auto_id]->items as $key => $label}
-		    {if in_array($key, $autaUtvaru)}
-			<label n:name="auto_id:$key"><input n:name="auto_id:$key"> {$label}</label>
-		    {/if}
-		{/foreach}
-		{var $autaUtvaru = null}
-	    {/foreach}
-	{else}
-	    <h3>Auta dostupné pro rezervaci</h3>
-	    <div class='auta'>
-	    {if !empty($autaUtvaru)}
-	    {foreach $form[auto_id]->items as $key => $label}
-		<label n:name="auto_id:$key"><input n:name="auto_id:$key"> {$label}</label>
-	    {/foreach}
-	    {/if}
-	</div>
-	{/if}
-	<h3> Vyberte datum rezervace</h3>
-	<div class='den'>
-	    <table>
-	    <tr>
-	    {foreach $form[den]->items as $key => $label}
-		<td><label n:name="den:$key"><input n:name="den:$key"> {$label}</label></td>
-		{if $iterator->counter == 7}
-		</tr><tr>
-		{/if} 
-	    {/foreach}
-	    </tr>
-	    </table>
-	</div>
-	<h3> Vyberte si čas rezervace</h3>
-	<div class='cas'>
-	    Od <select n:name=casOd />  do<select n:name=casDo />
-	</div>
-	<div class='send'>
-	    <input n:name=send>
-	    <!--<input n:name=liveSend style="display: none;">-->
-	</div>
-    </form>
-{/define}	
 
 <script>
     {include #jsCallback, input => den, link => formRef}
@@ -157,3 +185,26 @@
 	});
     });
 {/define}   
+
+<script>
+<!--
+$('#jinyRidic').focus().keyup(function(event) {
+$.getJSON({link autoComplete!}, {'text': $('#jinyRidic').val()}, function(payload) {
+$('ul').remove();
+var list = $('<ul></ul>').insertAfter('#jinyRidic');
+for (var i in payload.autoComplete) {
+$('<li></li>').text(payload.autoComplete[i]).appendTo(list);
+}
+});
+});
+-->
+</script>
+<!--<script>
+	$(function() {
+	        var availableTags = ["slovo1", "slovo2", "slovo3"];
+	        $("#jinyRidic").autocomplete({
+	            source: availableTags,
+	            delay: 0
+	        });
+	    });
+</script>-->

@@ -11,9 +11,12 @@
 	    <strong>Byla zrušena. </strong>
 	<br /> Auto můžete mít k dispozici již dříve. Pokud si přejeta upravit svou rezervaci, pokračujte <a href="{$basePath}/reserve/list">tady</a>.</p>
 	
-	<p><strong>Detail Vaší rezervace: </strong><br />
-	{$autoN} - {$spzN} : od {$odN|date:'H:i'} do {$doN|date:'H:i'} {$doN|date:'d.m.Y'}  
-	</p>
+        <p><strong>Detail Vaší rezervace: </strong><br />
+	    Rezervováno dne: <strong>{$vytvorenoN|date:'d.m.y'}</strong><br />
+	    {$autoN} - {$spzN} : od {$odN|date:'H:i'} do {$doN|date:'H:i'} {$doN|date:'d.m.Y'}<br />  
+	    Cíl cesty : <strong>{$destinaceN}</strong>
+	</p> 
+	
 	<p style="padding-left: 460px;"> &COPY; <a href="mailto:petr.stefan@vitkovice.cz">Petr Stefan</a> 2014</p>
     </div>
 </body>

@@ -66,8 +66,15 @@ class Statistics extends Nette\Object
 	    $pole[$np->auto_id]['spz'] = $np->auto->spz; 
 	    $pole[$np->auto_id]['counted'] = $np->counted; 
 	   
-	    foreach ($np->auto->related('utvar_auto.auto_id') AS $utvarAuto){
-		$pole[$np->auto_id]['utvar'] = $utvarAuto->utvar->nazev;
+	    $utvary = $np->auto->related('utvar_auto.auto_id');
+	    if(count($utvary)){
+		foreach ($utvary AS $utvarAuto){
+		    $pole[$np->auto_id]['utvar'] = $utvarAuto->utvar->nazev;
+		}
+	    }else{
+		/* pokud auto není v útvaru */
+		$pole[$np->auto_id]['utvar'] = 'Nezařazeno';
+
 	    }
         }
 	foreach ($this->database->table('vw_autoPujcenoHodin') as $np1){

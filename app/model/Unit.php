@@ -193,6 +193,19 @@ class Unit extends \Nette\Object
 	} catch (\PDOException $e) {
 	    throw new MyExceptions\AddPdoException("Chyba při přidávání".$e->getMessage());
 	}
-	
+    }
+    
+    public function autaBezUtvaru() 
+    {
+	$autosId =array();
+	foreach ($this->database->table('utvar_auto')->select('auto_id') as $utvar_auto) {
+	   $autosId[] = $utvar_auto->auto_id;
+	}
+	return	$this->database->table('auto')->where('id NOT', $autosId );
+    }
+    
+    public function autaNaViceUtvarech() 
+    {
+	return $this->database->table('utvar_auto')->group('auto_id')->having('count(auto_id) > 1');
     }
 }

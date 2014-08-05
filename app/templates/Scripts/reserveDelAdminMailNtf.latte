@@ -8,7 +8,11 @@
     <div id="content">
 	<p style="font-size: 120%;">Byla Vám zrušena rezervace v {date('H:i  d.m.Y')} uživatelem: <strong>{$delUserName}</strong></p>
 	<p>V případě jakýchkoli nejasnosti se zrušením rezervace kontaktujte p./pa. <a href="mailto:{$delUserEmail}"><strong>{$delUserName}</strong></a> </p>
-	<p>Detali Vaší rezervace: <strong>{$jmeno}</strong> rezervováno od <strong>{$od|date:'H:i'}</strong>  do <strong>{$do|date:'H:i'}</strong> {$do|date:'d.m.Y'} - <strong>{$auto} - {$spz}</strong> - ZRUŠENO.</p> 
+	<p>Detali Vaší rezervace: <br />
+	    Rezervováno dne: <strong>{$vytvoreno|date:'d.m.y'}</strong><br />
+	    <strong>{$jmeno}</strong> rezervováno od <strong>{$od|date:'H:i'}</strong>  do <strong>{$do|date:'H:i'}</strong> {$do|date:'d.m.Y'} - <strong>{$auto} - {$spz}</strong> - ZRUŠENO.<br />
+	    Cíl cesty : <strong>{$destinace}</strong>
+	</p> 
 	
 	<p style="padding-left: 460px;"> &COPY; <a href="mailto:petr.stefan@vitkovice.cz">Petr Stefan</a> 2014</p>
     </div>

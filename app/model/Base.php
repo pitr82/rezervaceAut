@@ -46,7 +46,7 @@ class Base extends Nette\Object{
      */
     private function createVypisAuta()
     {
-	return  $this->database->table('auto');
+	return  $this->database->table('auto')->order('znackaAuta.znacka');
     }
     /**
      * Funkce pro vráceni výpisu utvaru, pokud není vloženo id, vypiše všechny

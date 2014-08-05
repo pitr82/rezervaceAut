@@ -75,7 +75,14 @@ class ReservePresenter extends SecurePresenter
 	$casDo = explode(' ',$reservace->rezervaceDo);
 
 	$this['zvolDatum']->setDefaults(array('datum' => $casOd[0]));
-	$this['formReserve']->setDefaults(array('den' => $casOd[0], 'casOd' => $casOd[1], 'casDo' => $casDo[1], 'auto_id' => $reservace->auto));
+	$this['formReserve']->setDefaults(array(
+	    'den' => $casOd[0], 
+	    'casOd' => $casOd[1], 
+	    'casDo' => $casDo[1], 
+	    'auto_id' => $reservace->auto, 
+	    'destinace' => $reservace->destinace, 
+	    'jinyRidic' => $reservace->jinyRidic
+	));
     }
     
     public function handleDelete($id)
@@ -126,6 +133,25 @@ class ReservePresenter extends SecurePresenter
 		$this->redrawControl('blizkerezervaceArea');
 	    }
     }	
+    
+    public function handleAutoComplete($text) 
+    {
+	$this->payload->autoComplete = array();
+	$text = trim($text);
+	if ($text !== '') {
+	    
+// vytvoříme seznam pro našeptávač
+	    foreach ($this->Reserve->vratJmenaZamestnancu() as $zamestnanec) {
+		$item = trim($zamestnanec->prijmeni.' '.$zamestnanec->jmeno);
+		if (strncasecmp($item, $text, strlen($text)) === 0) {
+		    $this->payload->autoComplete[] = $item;
+		}
+	    }
+	}
+// činnost presenteru tímto můžeme ukončit
+	$this->terminate();
+    }
+
     private function getPaginator()
     {
 	/* strankování  */
@@ -227,7 +253,7 @@ class ReservePresenter extends SecurePresenter
 		$poleAut[$auto->id] = $auto->spz.' '.$auto->znackaAuta->znacka;
 	    }
 	 }else{
-	     foreach($this->base->vypisUtvarZamestnance($this->user->identity->utvar_id)->related('utvar_auto') as $utvar_auto){
+	     foreach($this->base->vypisUtvarZamestnance($this->user->identity->utvar_id)->related('utvar_auto')->order('auto.znackaAuta.znacka') as $utvar_auto){
 		
 		$poleAut[$utvar_auto->auto->id] = $utvar_auto->auto->spz.' '.$utvar_auto->auto->znackaAuta->znacka;
 	    }
@@ -244,6 +270,12 @@ class ReservePresenter extends SecurePresenter
 		->setDefaultValue($this->DatumCas->defaultHodinyOd())->setAttribute('id', 'error');
 	$form->addSelect('casDo', 'Hodiny do', $casy)
 		->setDefaultValue($this->DatumCas->defaultHodinyDo());
+	$form->addText('destinace', 'Cíl cesty')
+		->setRequired('Zvolte cíl cesty')
+		->setAttribute('size', 60);
+	$form->addText('jinyRidic', 'Zvolte jiného řidiče')
+		->setAttribute('id','jinyRidic')
+		->setAttribute('size', 40);
 	$form->addSubmit('send', 'Rezervovat auto');
 
 	$form->onSuccess[] = $this->formReserveSucceeded;
@@ -261,18 +293,20 @@ class ReservePresenter extends SecurePresenter
 	$id = $this->getParameter('id');
 	
 	
-//kontrola tlačítka refresh, na které je navázana onchange ajaxu
-	//kontrola správnosti rezervace času, čas Od je = nebo > než čas Do nebo čas Od musí být větší než aktuální čas
-	if((strtotime($values->casOd)>=strtotime($values->casDo) || strtotime($values->den.' '.$values->casOd) <= strtotime('now'))){
-	    $this->flashMessage('Rezervace neproběhla. Nemůžete se rezervovat na již neaktuální časový úsek.', 'error');
-	    $form->render($form['casOd']->getControlPrototype()->addClass('error'));
-	    $form->render($form['casDo']->getControlPrototype()->addClass('error'));
-	    return;
+// administrátor může upravovat již probíhající rezervaci
+	
+	if ($this->user->identity->role != 'admin'){
+//kontrola správnosti rezervace času, čas Od je = nebo > než čas Do nebo čas Od musí být větší než aktuální čas
+	    if((strtotime($values->casOd)>=strtotime($values->casDo) || strtotime($values->den.' '.$values->casOd) <= strtotime('now'))){
+		$this->flashMessage('Rezervace neproběhla. Nemůžete se rezervovat na již neaktuální časový úsek.', 'error');
+		$form->render($form['casOd']->getControlPrototype()->addClass('error'));
+		$form->render($form['casDo']->getControlPrototype()->addClass('error'));
+		return;
+	    }
 	}
-
 	if(!$id){
 	    // přidávání do databáze
-	    if ($this->Reserve->pridejRezervaci($values->den, $values->casOd, $values->casDo, $values->auto_id, $this->user->getId(), $this->user->getId())){
+	    if ($this->Reserve->pridejRezervaci($values->den, $values->casOd, $values->casDo, $values->auto_id, $this->user->getId(), $this->user->getId(), $values->destinace, $values->jinyRidic )){
 		$this->flashMessage('Přidání rezervace proběho úspěšně.', 'success');
 		$this->redirect('list',$datum = $values->den );
 	    }else{
@@ -281,12 +315,13 @@ class ReservePresenter extends SecurePresenter
 		$form->render($form['casDo']->getControlPrototype()->addClass('error'));
 		$form->render($form['den']->getLabelPrototype()->addClass('error'));
 		$form->render($form['auto_id']->getLabelPrototype()->addClass('error'));
+		$form->render($form['destinace']->getLabelPrototype()->addClass('error'));
 	    }
 	}else{
 	    //editace - update v databázi
 	    $host = $this->context->httpRequest->url->hostUrl;
 	    $path = $this->context->httpRequest->url->basePath;
-	    if ($this->Reserve->editujRezervaci($values->den, $values->casOd, $values->casDo, $values->auto_id, $this->user->getId(), $id, $host.$path)){
+	    if ($this->Reserve->editujRezervaci($values->den, $values->casOd, $values->casDo, $values->auto_id, $this->user->getId(), $id, $host.$path, $values->destinace, $values->jinyRidic)){
 		$this->flashMessage('Úspěšně jste upravili rezervaci.', 'success');
 		$this->redirect('list',$datum = $values->den );
 	    }else{
@@ -295,6 +330,7 @@ class ReservePresenter extends SecurePresenter
 		$form->render($form['casDo']->getControlPrototype()->addClass('error'));
 		$form->render($form['den']->getLabelPrototype()->addClass('error'));
 		$form->render($form['auto_id']->getLabelPrototype()->addClass('error'));
+		$form->render($form['destinace']->getLabelPrototype()->addClass('error'));
 	    }
 	}
     }

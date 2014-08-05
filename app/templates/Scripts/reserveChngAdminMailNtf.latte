@@ -1,0 +1,32 @@
+{* Latte template *}
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Změny v rezervacích</title>
+</head>
+<body style="padding: 30px 0 0 0; margin: 0; font: 14px/1.65 Verdana, 'Geneva CE', lucida, sans-serif; color: #0c2f52;">
+    <div id="content">
+	<p style="font-size: 120%;">Ve vaší rezervaci <strong>{$id}</strong> došlo ke změnám</p>
+	<p>Změna byla provedena v {date('H:i  d.m.Y')}, změnu provedl  <a href="mailto:{$editUserEmail}"><strong>{$editUserName}</strong></a></p>
+		
+	<p><strong>Detail Vaší původní rezervace: </strong><br />
+	    
+	    Rezervováno dne: <strong>{$vytvorenoP|date:'d.m.y'}</strong><br />
+	    {$autoP} - <strong>{$spzP}</strong> : od <strong>{$odP|date:'H:i'}</strong> do <strong>{$doP|date:'H:i'}</strong> {$doP|date:'d.m.Y'}<br />  
+	    Cíl cesty : <strong>{$destinaceP}</strong> <br />
+	    {$jinyRidicP ? "Externí řidič:  $jinyRidicP"}
+	</p> 
+	
+	<p><strong>Detail Vaší pozměněné rezervace: </strong><br />
+	    
+	    Rezervováno dne: <strong>{$vytvorenoN|date:'d.m.y'}</strong><br />
+	    {$autoN} - <strong>{$spzN}</strong> : od <strong>{$odN|date:'H:i'}</strong> do <strong>{$doN|date:'H:i'}</strong> {$doN|date:'d.m.Y'}<br />  
+	    Cíl cesty : <strong>{$destinaceN}</strong><br />
+	    {$jinyRidicN ? "Externí řidič $jinyRidicN"}
+	</p> 
+	
+	
+	<p style="padding-left: 460px;"> &COPY; <a href="mailto:petr.stefan@vitkovice.cz">Petr Stefan</a> 2014</p>
+    </div>
+</body>
+</html>

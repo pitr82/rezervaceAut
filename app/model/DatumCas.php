@@ -45,7 +45,7 @@ class DatumCas extends Nette\Object{
 	$tOd = strtotime($od);
 	$tDo = strtotime($do);
 	$time = array();
-	$time[$od.'00'] = $od;
+	$time[$od.':00'] = $od;
 	while($tOd < $tDo){
 	    
 	    $tOd = strtotime('+'.($po*60).' minutes',$tOd);

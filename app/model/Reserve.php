@@ -41,7 +41,7 @@ class Reserve extends Base{
      * @param string $casDo	čas konce rezervace [11:30:00]
      * @param int $userId	id uživatele
      */
-    public function pridejRezervaci($den, $casOd, $casDo, $auto, $userId, $spravceID)
+    public function pridejRezervaci($den, $casOd, $casDo, $auto, $userId, $spravceID, $destinace, $jinyRidic = null)
     {
 	$od = $den.' '.$casOd;
 	$do = $den.' '.$casDo;
@@ -59,7 +59,9 @@ class Reserve extends Base{
 		'zamestnanec_id' => $userId,
 		'rezervaceOd' => $den.' '.$casOd,
 		'rezervaceDo' => $den.' '.$casDo,
-		'spravce_id'=>	$spravceID
+		'spravce_id' =>	$spravceID,
+		'destinace' => $destinace,
+		'jinyRidic' => $jinyRidic
 	    ));
 	    return true;    
 	}else{
@@ -90,6 +92,7 @@ class Reserve extends Base{
 	$template->odN = $nasledujiciRezervace->rezervaceOd;
 	$template->doN = $nasledujiciRezervace->rezervaceDo;
 	$template->vytvorenoN = $nasledujiciRezervace->vytvoreno;
+	$template->destinaceN = $nasledujiciRezervace->destinace;
 	$template->jmenoN = $nasledujiciRezervace->zamestnanec->jmeno." ".$nasledujiciRezervace->zamestnanec->prijmeni;
 	$template->emailN = $nasledujiciRezervace->zamestnanec->email;
 	$template->telN = $nasledujiciRezervace->zamestnanec->tel;
@@ -98,7 +101,7 @@ class Reserve extends Base{
 	$mail = new Nette\Mail\Message;
 	$mail->setFrom('Systém rezervace aut <no-reply-is-rezervace@vitkovice.cz>')
 		->addTo($nasledujiciRezervace->zamestnanec->email)
-		->setSubject('Změna v rezervaci předvámi')
+		->setSubject('Změna v rezervaci před Vámi')
 		->setHtmlBody($template);
 	$this->mailer->send($mail);
     }
@@ -119,6 +122,8 @@ class Reserve extends Base{
 	$template->email = $rezervace->zamestnanec->email;
 	$template->tel = $rezervace->zamestnanec->tel;
 	$template->id = $rezervace->id;
+	$template->destinace = $rezervace->destinace;
+	$template->vytvoreno = $rezervace->vytvoreno;
 	$template->auto = $rezervace->auto->znackaAuta->znacka;
 	$template->spz = $rezervace->auto->spz;
 	$template->delUserName = $delUserName;
@@ -143,7 +148,7 @@ class Reserve extends Base{
      * @param int $idRezervace	id rezervace
      * @param string $basePath  BasePath aplikace
      */
-    public function editujRezervaci($den, $casOd, $casDo, $auto, $userId, $idRezervace, $basePath)
+    public function editujRezervaci($den, $casOd, $casDo, $auto, $userId, $idRezervace, $basePath, $destinace, $jinyRidic = null)
     {
 	$od = $den.' '.$casOd;
 	$do = $den.' '.$casDo;
@@ -181,11 +186,12 @@ class Reserve extends Base{
 		    $template->email = $rezervace->zamestnanec->email;
 		    $template->tel = $rezervace->zamestnanec->tel;
 		    $template->id = $rezervace->id;
-		    $template->autoN = $nasledujiciRezervace->auto->znacka->znacka;
+		    $template->autoN = $nasledujiciRezervace->auto->znackaAuta->znacka;
 		    $template->spzN = $nasledujiciRezervace->auto->spz;
 		    $template->odN = $nasledujiciRezervace->rezervaceOd;
 		    $template->doN = $nasledujiciRezervace->rezervaceDo;
 		    $template->vytvorenoN = $nasledujiciRezervace->vytvoreno;
+		    $template->destinaceN = $nasledujiciRezervace->destinace;
 		    $template->jmenoN = $nasledujiciRezervace->zamestnanec->jmeno." ".$nasledujiciRezervace->zamestnanec->prijmeni;
 		    $template->emailN = $nasledujiciRezervace->zamestnanec->email;
 		    $template->telN = $nasledujiciRezervace->zamestnanec->tel;
@@ -199,13 +205,50 @@ class Reserve extends Base{
 		    $this->mailer->send($mail);
 		}
 	    }	
+	    /* pro update si zvolíme novou proměnnou, abychom si nesmazali půvorní data pro odeslání emailu */
+	    $updateRezervace = $this->database->table('rezervace')->get($idRezervace);
+	    $updateRezervace->update(array(
+		    'auto_id' => $auto,
+		    'spravce_id' => $userId,
+		    'rezervaceOd' => $den.' '.$casOd,
+		    'rezervaceDo' => $den.' '.$casDo, 
+		    'destinace' => $destinace,
+		    'jinyRidic' => $jinyRidic
+		));	    
+	  // pokud rezervaci upravil jiný uživatel než vlastník, pošli mail
+	    if($rezervace->zamestnanec_id != $userId){
+		$fileLatte = dirname(dirname(__FILE__)).'/templates/Scripts/reserveChngAdminMailNtf.latte';
+	        $template = new Nette\Templating\FileTemplate($fileLatte);
+		$template->registerFilter(new Nette\Latte\Engine);
+		$template->registerHelperLoader('Nette\Templating\Helpers::loader');
+		$template->basePath = $basePath;
+		$template->editUserName = $rezervace->ref('zamestnanec', 'spravce_id')->jmeno." ".$rezervace->ref('zamestnanec', 'spravce_id')->prijmeni;
+		$template->editUserEmail = $rezervace->ref('zamestnanec', 'spravce_id')->email;
+		$template->id = $rezervace->id;
+		$template->odP = $rezervace->rezervaceOd;
+		$template->doP = $rezervace->rezervaceDo;
+		$template->autoP = $rezervace->auto->znackaAuta->znacka;
+		$template->spzP = $rezervace->auto->spz;
+		$template->vytvorenoP = $rezervace->vytvoreno;
+		$template->destinaceP = $rezervace->destinace;
+		$template->jinyRidicP = $rezervace->jinyRidic;
+		/* aktualizujeme údaje*/
+		$template->odN = $updateRezervace->rezervaceOd;
+		$template->doN = $updateRezervace->rezervaceDo;
+		$template->autoN = $updateRezervace->auto->znackaAuta->znacka;
+		$template->spzN = $updateRezervace->auto->spz;
+		$template->vytvorenoN = $updateRezervace->vytvoreno;
+		$template->destinaceN = $updateRezervace->destinace;
+		$template->jinyRidicN = $updateRezervace->jinyRidic;
+		
+		$mail = new Nette\Mail\Message;
+		$mail->setFrom('Systém rezervace aut <no-reply-is-rezervace@vitkovice.cz>')
+			    ->addTo($rezervace->zamestnanec->email)
+			    ->setSubject('Změna v rezervaci auta !')
+			    ->setHtmlBody($template);
+		$this->mailer->send($mail);
+	    }
 	    
-	    $rezervace->update(array(
-		'auto_id' => $auto,
-//		'zamestnanec_id' => $userId,
-		'rezervaceOd' => $den.' '.$casOd,
-		'rezervaceDo' => $den.' '.$casDo
-	    ));
 	    return true;    
 	}else{
 	    return false;
@@ -271,5 +314,10 @@ class Reserve extends Base{
 	    return $this->database->table('rezervace')->where("rezervaceDo >= ?", date('Y-m-d H:i:s'))->where('zamestnanec.utvar_id = ?',$utvar)->order('rezervaceOd');
 	else
 	    return $this->database->table('rezervace')->where("rezervaceDo >= ?", date('Y-m-d H:i:s'))->order('rezervaceOd');
+    }
+    
+    public function vratJmenaZamestnancu() 
+    {
+	   return  $this->database->table('zamestnanec')->select('prijmeni, jmeno')->order('prijmeni ASC');
     }
 }

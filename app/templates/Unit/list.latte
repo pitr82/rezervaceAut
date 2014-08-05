@@ -3,6 +3,50 @@
 <h1 n:block=title>Útvary</h1>
 {/block}
 {block content}
+
+<h2>Útvary a jejich auta</h2>
+
+<form n:name=unitCarForm>
+    <p><label n:name=utvar_id>Vyber útvar <select n:name=utvar_id /></label></p>
+    {snippet tabUnitCar}
+    <table class='list'>
+	<tr><th>Spz - auta</th><th>Firma</th><th>Typ</th><th>Značka</th><th>Popis</th></tr>
+	    <tr n:foreach="$_form[auto_id]->items as $key => $label" n:class='$iterator->even ? suda:licha'>    
+		<td><label n:name="auto_id:$key"><input n:name="auto_id:$key"> {$label}</label></td>
+		<td>{$auta[$key][firma]}</td>
+		<td>{$auta[$key][typAuta]}</td>
+		<td>{$auta[$key][znackaAuta]}</td>
+		<td>{$auta[$key][popis]}</td>
+	    </tr>
+    </table>
+    {/snippet}
+    <p><input n:name=send> </p>
+    {if count($autaBezUtvaru)}
+	<p>
+	<span class="red">
+	Pozor:  auto/a bez útvaru:
+	</span>
+	{foreach $autaBezUtvaru as $abu}
+	    {$abu->znackaAuta->znacka. '- spz: ' .$abu->spz} 
+	    {sep}, {/sep}
+	{/foreach} 
+	</p>
+    {/if}
+    {if count($autaNaViceUtvarech)}
+	<p>
+	<span class="red">
+	Pozor: auto je přiřazeno k více útvarům:
+	</span>
+	{foreach $autaNaViceUtvarech as $anvu}
+	    {$anvu->auto->znackaAuta->znacka. '- spz: ' .$anvu->auto->spz} 
+	    {sep}, {/sep}
+	{/foreach} 
+	</p>
+    {/if}
+    
+</form>
+    
+
 <h2>Výpis firem</h2>
 <table class='list'>
     <tr><th>Č.</th><th>Název</th><th>IČO</th><th>DIČ</th><th>Ulice</th><th>Město</th><th>Psč</th><th>Stát</th><th>Editovat</th><th>Odstranit</th></tr>
@@ -61,24 +105,7 @@
 </form>
     
     
-<h2>Útvary a jejich auta</h2>
 
-<form n:name=unitCarForm>
-    <p><label n:name=utvar_id>Vyber útvar <select n:name=utvar_id /></label></p>
-    {snippet tabUnitCar}
-    <table class='list'>
-	<tr><th>Spz - auta</th><th>Firma</th><th>Typ</th><th>Značka</th><th>Popis</th></tr>
-	    <tr n:foreach="$_form[auto_id]->items as $key => $label" n:class='$iterator->even ? suda:licha'>    
-		<td><label n:name="auto_id:$key"><input n:name="auto_id:$key"> {$label}</label></td>
-		<td>{$auta[$key][firma]}</td>
-		<td>{$auta[$key][typAuta]}</td>
-		<td>{$auta[$key][znackaAuta]}</td>
-		<td>{$auta[$key][popis]}</td>
-	    </tr>
-    </table>
-    {/snippet}
-    <p><input n:name=send> - zaškrtnutá auta patří útvaru</p>
-</form>
 
 
 <script>

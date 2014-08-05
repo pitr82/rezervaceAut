@@ -43,6 +43,7 @@
 				->select('auto_id, DATE(rezervaceDo) AS rezervaceDo, SUM(TIMESTAMPDIFF(MINUTE, rezervaceOd, rezervaceDo)/60) AS pocet')
 				->where('rezervaceDo > NOW() - INTERVAL '.($pSloupcu-1).' DAY')
 				->where('CURDATE() >= DATE(rezervaceDo)')
+				->where('auto_id = ?', $utvarAuto->auto->id)
 				->group('DATE(rezervaceDo)')}
 		    {foreach $sql as $rezervace}
 			{* cyklus pro vypsání nulových hodnot *}
@@ -52,7 +53,7 @@
 			    {* zvýšení dne pro kontrolu *}
 			    {? $datumOd->modify('+1 DAY')}
 			{/while}
-			<td><strong>{$rezervace->rezervaceDo|date:'d.m'}<br />{$rezervace->pocet}</strong> h</td>
+		    <td><strong>{$rezervace->rezervaceDo|date:'d.m'}<br />{round($rezervace->pocet,1)}</strong>&nbsp;h</td>
 			    {* zvýšení dne pro kontrolu *}
 			    {? $datumOd->modify('+1 DAY')}
 			    {? $sumaHodin += $rezervace->pocet}

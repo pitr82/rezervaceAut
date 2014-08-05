@@ -53,7 +53,7 @@ class UserPresenter extends AdminPresenter
 	$vp = new VisualPaginator($this, 'paginator');
 	$paginator = $vp->getPaginator();
         $paginator->itemCount = $sql->count('*');
-	$paginator->itemsPerPage = 10;
+	$paginator->itemsPerPage = 40;
 
 	if(!$this->getParameter('page'))
 	    $paginator->Page = 1;

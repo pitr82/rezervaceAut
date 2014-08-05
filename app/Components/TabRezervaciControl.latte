@@ -20,7 +20,7 @@
 	{*pokud je výpis aut z více útvaru*}
 	{foreach $utvar as $ut}
 	    <tr><td colspan="{$pocetSloupcu+1}" style="width:100%;"><h3>Auta na útvaru: {$ut->nazev}</h3></td></tr>
-	    {var $sql = $ut->related('utvar_auto')}
+	    {var $sql = $ut->related('utvar_auto')->order('auto.znackaAuta.znacka')}
 	    {if count($sql)!= 0}
 		{include trCas}
 	    {/if}	
@@ -93,8 +93,14 @@
 		{capture $minDo} {$rezervace->rezervaceDo|date:'%M'}{/capture}
 		{capture $zprava} 
 		    <div class="bublina">&nbsp;
-			    <span>Zarezervováno pro: {$rezervace->zamestnanec->prijmeni} {$rezervace->zamestnanec->jmeno}<br />
-				od:{$rezervace->rezervaceOd|date:'%k:%M'} - do:{$rezervace->rezervaceDo|date:'%k:%M'}
+			    <span>
+				Dne {$rezervace->vytvoreno|date:'%d.%m'} si <strong>{$rezervace->zamestnanec->prijmeni} {$rezervace->zamestnanec->jmeno}</strong><br />
+				{if $rezervace->jinyRidic}
+				    pro: <strong>{$rezervace->jinyRidic}</strong> <br />
+				{/if}
+				rezervovál cestu: <strong>{$rezervace->destinace}</strong> <br />
+				mezi <strong>{$rezervace->rezervaceOd|date:'%k:%M'}</strong> až <strong>{$rezervace->rezervaceDo|date:'%k:%M'}</strong> {$rezervace->rezervaceDo|date:'%d.%m.%y'}<br />
+				č. rezervace: {$rezervace->id}
 			    </span>
 		    </div>
 		{/capture}

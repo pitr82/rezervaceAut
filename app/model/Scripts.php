@@ -47,6 +47,7 @@ class Scripts extends \Nette\Object
 		$template->spz = $res->auto->spz;
 		$template->od = $res->rezervaceOd;
 		$template->do = $res->rezervaceDo;
+		$template->destinace = $res->destinace;
 		$template->vytvoreno = $res->vytvoreno;
 		$template->jmeno = $res->zamestnanec->jmeno." ".$res->zamestnanec->prijmeni;
 		$template->email = $res->zamestnanec->email;
