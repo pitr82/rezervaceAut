@@ -1,9 +1,6 @@
-<<<<<<< OURS
 Aplikace rezervace aut
 =======================
-aplikace je určena k rezervací automobilů pro firemní zaměstnance. 
-
-
+Aplikace je určena k rezervací automobilů pro firemní zaměstnance. 
 
 Aplikace IS rezervace aut  je založeno na Nette Framework 
 
@@ -17,7 +14,6 @@ Nette Framework Sandbox
 
 The basic skeleton of application.
 
->>>>>>> THEIRS
 
 What is [Nette Framework](http://nette.org)?
 --------------------------------------------
