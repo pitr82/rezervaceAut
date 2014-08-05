@@ -133,7 +133,10 @@ class ReservePresenter extends SecurePresenter
 		$this->redrawControl('blizkerezervaceArea');
 	    }
     }	
-    
+/* 
+ * Používá přímy přístup do databáze, 
+ * obslužný javascript v ReserveForm.latte
+ * 
     public function handleAutoComplete($text) 
     {
 	$this->payload->autoComplete = array();
@@ -151,7 +154,7 @@ class ReservePresenter extends SecurePresenter
 // činnost presenteru tímto můžeme ukončit
 	$this->terminate();
     }
-
+*/
     private function getPaginator()
     {
 	/* strankování  */
@@ -183,6 +186,10 @@ class ReservePresenter extends SecurePresenter
 	if(!isset($this->template->paginator)){
 	    $this->getPaginator();
 	}
+	foreach ($this->Reserve->vratJmenaZamestnancu() as $zamestnanec) {
+		$uzivatele[] = trim($zamestnanec->prijmeni.' '.$zamestnanec->jmeno);
+	}
+	$this->template->uzivatele = $uzivatele; 
     }
     
     public function renderEdit($id)
@@ -199,7 +206,10 @@ class ReservePresenter extends SecurePresenter
 	if(!isset($this->template->paginator)){
 	    $this->getPaginator();
 	}
-	
+	foreach ($this->Reserve->vratJmenaZamestnancu() as $zamestnanec) {
+		$uzivatele[] = trim($zamestnanec->prijmeni.' '.$zamestnanec->jmeno);
+	}
+	$this->template->uzivatele = $uzivatele; 
     }
     
     public function renderList($datum)

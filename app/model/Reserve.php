@@ -320,4 +320,5 @@ class Reserve extends Base{
     {
 	   return  $this->database->table('zamestnanec')->select('prijmeni, jmeno')->order('prijmeni ASC');
     }
+    
 }

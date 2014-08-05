@@ -65,7 +65,8 @@
 	
 	{if $user->isInRole('admin')}
 	    <h3>Zadejte jiného řidiče</h3>
-	    <input n:name="jinyRidic" class="autaocomplete">
+
+     <input n:name="jinyRidic" class="autaocomplete">
 	    {foreach $utvary as $utvar}
 		<h3>Auta na: {$utvar->nazev}</h3>
 		{* $autaUtvaru můžou být prázdná *}
@@ -158,6 +159,7 @@
 	ul.pagination li.active { font-weight: bold; -webkit-box-shadow: inset -1px 2px 5px rgba(0,0,0,0.25); -moz-box-shadow: inset -1px 2px 5px rgba(0,0,0,0.25);
 				    box-shadow: inset -1px 2px 5px rgba(0,0,0,0.25); }
 	#content ul.pagination li a { color: #006aeb; box-shadow: none; background: none; }
+	
     </style>
     <!--[if IE 8]>
     <style>
@@ -178,7 +180,7 @@
 	$.nette.ajax({
 	    type: 'POST',
 //		off: ['unique'],
-	    url: '?do=formRef',
+	    url: '?do={$link}',
 	    data: {
 		'value': $(this).val()
 	    }
@@ -186,25 +188,28 @@
     });
 {/define}   
 
-<script>
+<!--javascript využívá handleAutoComplete v ReservePresenter-->
+<!--<script>-->
 <!--
-$('#jinyRidic').focus().keyup(function(event) {
-$.getJSON({link autoComplete!}, {'text': $('#jinyRidic').val()}, function(payload) {
-$('ul').remove();
-var list = $('<ul></ul>').insertAfter('#jinyRidic');
-for (var i in payload.autoComplete) {
-$('<li></li>').text(payload.autoComplete[i]).appendTo(list);
-}
-});
-});
+// AUTOCOMPLETE do UL
+//$('#jinyRidic').focus().keyup(function(event) {
+//$.getJSON({link autoComplete!}, {'text': $('#jinyRidic').val()}, function(payload) {
+//$('ul').remove();
+//var list = $('<ul></ul>').insertAfter('#jinyRidic');
+//for (var i in payload.autoComplete) {
+//$('<li></li>').text(payload.autoComplete[i]).appendTo(list);
+//}
+//});
+//});
 -->
-</script>
-<!--<script>
-	$(function() {
-	        var availableTags = ["slovo1", "slovo2", "slovo3"];
+<!--</script>-->
+
+<script>
+
+$(function() {
 	        $("#jinyRidic").autocomplete({
-	            source: availableTags,
+	            source: {$uzivatele},
 	            delay: 0
 	        });
 	    });
-</script>-->
+</script>
