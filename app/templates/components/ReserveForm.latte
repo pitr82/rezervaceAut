@@ -123,6 +123,7 @@
 	    {/foreach}
 	    </tr>
 	    </table>
+	    <input n:name=allDays />
 	</div>
 	<h3> Vyberte si čas rezervace</h3>
 	<div class='cas'>
@@ -204,12 +205,37 @@
 -->
 <!--</script>-->
 
+<!--Script pro autocomplete řidiče-->
 <script>
-
 $(function() {
 	        $("#jinyRidic").autocomplete({
 	            source: {$uzivatele},
 	            delay: 0
 	        });
 	    });
+</script>
+
+<!--Script, který při zaškrtnutí checkboxu zakáže ostatní výběry-->
+<script>
+function disableField() 
+{
+    if ( document.getElementById('allDays').checked == true ){
+	document.getElementById('frm-formReserve-destinace').disabled = true;
+	document.getElementById('frm-formReserve-destinace').className = 'disable';
+	document.getElementById('casOd').disabled = true;
+	document.getElementById('casOd').className = 'disable';
+	document.getElementById('casDo').disabled = true;
+	document.getElementById('casDo').className = 'disable';
+    }else if (document.getElementById('allDays').checked == false ){
+	document.getElementById('frm-formReserve-destinace').disabled = false;
+	document.getElementById('casOd').disabled = false;
+	document.getElementById('casDo').disabled = false;
+	var elements = document.getElementsByClassName('disable');
+	for (var i=0; i<elements.length;i++){
+	    elements[i].className = 'aa';
+	}
+		document.getElementById('casDo').className = 'sss';
+
+    }
+}
 </script>

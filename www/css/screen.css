@@ -154,3 +154,13 @@ textarea:focus, input[type="login"]:focus, input[type="text"]:focus, input[type=
 	outline-style: none;
 	box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.075) inset, 0px 0px 8px rgba(82, 168, 236, 0.6);
 }
+
+textarea.disable , select.disable , input.disable {
+
+	border: 1px solid red; 
+	-webkit-border-radius: 5px; 
+	-moz-border-radius: 5px; 
+	border-radius: 5px; 
+	outline:0; 
+	height:25px; 
+}

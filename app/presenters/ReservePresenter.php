@@ -277,15 +277,20 @@ class ReservePresenter extends SecurePresenter
 		->setAttribute('class', 'ajax');
 	$casy = $this->DatumCas->rozsahHodin(true);
 	$form->addSelect('casOd', 'Hodiny od',$casy)
-		->setDefaultValue($this->DatumCas->defaultHodinyOd())->setAttribute('id', 'error');
+		->setDefaultValue($this->DatumCas->defaultHodinyOd())
+		->setAttribute('id', 'casOd');
 	$form->addSelect('casDo', 'Hodiny do', $casy)
-		->setDefaultValue($this->DatumCas->defaultHodinyDo());
+		->setDefaultValue($this->DatumCas->defaultHodinyDo())
+		->setAttribute('id', 'casDo');
 	$form->addText('destinace', 'Cíl cesty')
 		->setRequired('Zvolte cíl cesty')
 		->setAttribute('size', 60);
 	$form->addText('jinyRidic', 'Zvolte jiného řidiče')
 		->setAttribute('id','jinyRidic')
 		->setAttribute('size', 40);
+	$form->addCheckbox('allDays')
+		->setAttribute('id', 'allDays')
+		->setAttribute('onchange', 'disableField()');
 	$form->addSubmit('send', 'Rezervovat auto');
 
 	$form->onSuccess[] = $this->formReserveSucceeded;
