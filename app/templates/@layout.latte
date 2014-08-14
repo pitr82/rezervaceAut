@@ -75,10 +75,10 @@
 	{block styles}{/block}
 	
 	{block scripts}
-	<script src="{$basePath}/js/jquery.js"></script>
-	<script src="{$basePath}/js/jquery-ui.min.js"></script>
-	<script src="{$basePath}/js/netteForms.js"></script>
-	<script src="{$basePath}/js/nette.ajax.js"></script>
+	<script src="{$basePath}/js/jquery.js?{=Constants::PROGRAM_VERSION}"></script>
+	<script src="{$basePath}/js/jquery-ui.min.js?{=Constants::PROGRAM_VERSION}"></script>
+	<script src="{$basePath}/js/netteForms.js?{=Constants::PROGRAM_VERSION}"></script>
+	<script src="{$basePath}/js/nette.ajax.js?{=Constants::PROGRAM_VERSION}"></script>
 	<script src="{$basePath}/js/main.js?{=Constants::PROGRAM_VERSION}"></script>
 	{/block}
 </head>

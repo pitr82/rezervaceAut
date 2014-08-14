@@ -72,11 +72,9 @@ class UnitPresenter extends SecurePresenter
             $this['unitCarForm']['auto_id']
                 ->setItems($this->unit->vratAuta()->fetchPairs('id', 'spz'))
 		->setDefaultvalue($this->unit->autaUtvaru($value));
-
         } else {
             $this['unitCarForm']['auto_id']->setItems(array());
         }
-
         $this->redrawControl('tabUnitCar');
     }
     

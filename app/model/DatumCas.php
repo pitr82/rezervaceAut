@@ -87,4 +87,34 @@ class DatumCas extends Nette\Object{
 	    $mesice[$i] = $i;
 	return $mesice;
     }
+    
+    /**
+     * 
+     * @param int $pocetDnu	počet dnu na rezervace
+     * @return array		pole s dny [2014-05-14]
+     */
+    public function rezervaceNaDny ($pocetDnu)
+    {
+	for($i = 0; $i<$pocetDnu; $i++){
+	    switch($i) {
+		case 0 :
+		  $poleDnu[date('Y-m-d')] = 'dnešek';
+		  break;
+		case 1 :
+		  $poleDnu[date('Y-m-d',mktime(0,0,0,date('m'),date('d')+$i,date('Y')))] = 'zítřek';
+		  break;
+		default:
+		  $poleDnu[date('Y-m-d',mktime(0,0,0,date('m'),date('d')+$i,date('Y')))]  = date('d.m.',mktime(0,0,0,date('m'),date('d')+$i,date('Y')));
+	    }
+	}
+	return $poleDnu;
+    }
+    
+    public function rezervaceNaCeleDny ($pocetDnu)
+    {
+	for($i = 0; $i<$pocetDnu; $i++){
+	    $poleDnu[date('Y-m-d',mktime(0,0,0,date('m'),date('d')+$i,date('Y')))]  = date('d.m.',mktime(0,0,0,date('m'),date('d')+$i,date('Y')));
+	}
+	return $poleDnu;
+    }
 }

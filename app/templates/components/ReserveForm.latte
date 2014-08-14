@@ -52,9 +52,9 @@
     </form>
 </div>
 <div class='reserveForm background'>
-    {snippet reserveForm}
+    
     {include #reserveForm}
-    {/snippet}
+    
 </div>
        
 
@@ -62,11 +62,9 @@
 
 {define #reserveForm}
 <form n:name=formReserve>
-	
 	{if $user->isInRole('admin')}
 	    <h3>Zadejte jiného řidiče</h3>
-
-     <input n:name="jinyRidic" class="autaocomplete">
+	    <input n:name="jinyRidic" class="autaocomplete">
 	    {foreach $utvary as $utvar}
 		<h3>Auta na: {$utvar->nazev}</h3>
 		{* $autaUtvaru můžou být prázdná *}
@@ -112,6 +110,25 @@
 	</div>
 	{/if}
 	<h3> Vyberte datum rezervace</h3>
+	{if $user->isInRole('admin')}
+	{*Zobrazit jen v default pohledu *}
+	{if in_array($presenter->getAction(TRUE), array(':Reserve:default'))}
+	<h4> <input n:name=allDays /> Rezervovat na celé dny</h4>
+	<div id="rezMulti" class="">
+	    <table>
+	    <tr>
+	    {foreach $form[dny]->items as $key => $label}
+		<td><label n:name="dny:$key"><input n:name="dny:$key"> {$label}</label></td>
+		{if $iterator->counter == 7}
+		</tr><tr>
+		{/if} 
+	    {/foreach}
+	    </tr>
+	    </table>
+	</div>
+	{/if}
+	{/if}
+	<div id="rezSingle">
 	<div class='den'>
 	    <table>
 	    <tr>
@@ -123,11 +140,11 @@
 	    {/foreach}
 	    </tr>
 	    </table>
-	    <input n:name=allDays />
 	</div>
 	<h3> Vyberte si čas rezervace</h3>
 	<div class='cas'>
 	    Od <select n:name=casOd />  do<select n:name=casDo />
+	</div>
 	</div>
 	<h3> Zadejte cíl cesty</h3>
 	<div class='destinace'>
@@ -135,7 +152,9 @@
 	</div>
 	<div class='send'>
 	    <input n:name=send>
-	    <!--<input n:name=liveSend style="display: none;">-->
+	    <ul class="errors" n:if="$form->hasErrors()">
+	     <li n:foreach="$form->errors as $error">{$error}</li>
+	    </ul>
 	</div>
     </form>
 {/define}	
@@ -177,7 +196,7 @@
 </script>
     
 {define #jsCallback}
-    $('input[type=radio].ajax').on('change', function() {
+    $('input[type=checkbox].ajax, input[type=radio].ajax').on('change', function() {
 	$.nette.ajax({
 	    type: 'POST',
 //		off: ['unique'],
@@ -189,21 +208,8 @@
     });
 {/define}   
 
-<!--javascript využívá handleAutoComplete v ReservePresenter-->
-<!--<script>-->
-<!--
-// AUTOCOMPLETE do UL
-//$('#jinyRidic').focus().keyup(function(event) {
-//$.getJSON({link autoComplete!}, {'text': $('#jinyRidic').val()}, function(payload) {
-//$('ul').remove();
-//var list = $('<ul></ul>').insertAfter('#jinyRidic');
-//for (var i in payload.autoComplete) {
-//$('<li></li>').text(payload.autoComplete[i]).appendTo(list);
-//}
-//});
-//});
--->
-<!--</script>-->
+
+
 
 <!--Script pro autocomplete řidiče-->
 <script>
@@ -215,28 +221,78 @@ $(function() {
 	    });
 </script>
 
+{*
+<!--javascript využívá handleAutoComplete v ReservePresenter-->
+<script>
+<!--
+ AUTOCOMPLETE do UL
+$('#jinyRidic').focus().keyup(function(event) {
+$.getJSON({link autoComplete!}, {'text': $('#jinyRidic').val()}, function(payload) {
+$('ul').remove();
+var list = $('<ul></ul>').insertAfter('#jinyRidic');
+for (var i in payload.autoComplete) {
+$('<li></li>').text(payload.autoComplete[i]).appendTo(list);
+}
+});
+});
+-->
+</script>
+
 <!--Script, který při zaškrtnutí checkboxu zakáže ostatní výběry-->
 <script>
 function disableField() 
 {
     if ( document.getElementById('allDays').checked == true ){
-	document.getElementById('frm-formReserve-destinace').disabled = true;
-	document.getElementById('frm-formReserve-destinace').className = 'disable';
+	// enable prvky
+	document.getElementById('denOd').disabled = false;
+	document.getElementById('denDo').disabled = false;
+	var elements = document.querySelectorAll('.disable');
+	var pocet = elements.length;
+	for (var i=0; i<pocet;i++){
+	    elements.item(i).className = '';
+	}
+	//Disable prvky
 	document.getElementById('casOd').disabled = true;
 	document.getElementById('casOd').className = 'disable';
 	document.getElementById('casDo').disabled = true;
 	document.getElementById('casDo').className = 'disable';
+	var inputs = document.getElementsByTagName("input"), item; 
+	for (var i = 0, len = inputs.length; i < len; i++) { 
+	    item = inputs[i];
+	    if (item.id && item.id.indexOf("frm-formReserve-den-") == 0) { 
+		// item.id starts with frm-formReserve-den-
+		item.disabled = true;
+	    }
+	} 
+//	Změna css
+//	document.getElementById('rezSingle').className='hidden';
+//	document.getElementById('rezMulti').className='visible';
     }else if (document.getElementById('allDays').checked == false ){
-	document.getElementById('frm-formReserve-destinace').disabled = false;
+	// enable prvky
 	document.getElementById('casOd').disabled = false;
 	document.getElementById('casDo').disabled = false;
-	var elements = document.getElementsByClassName('disable');
-	for (var i=0; i<elements.length;i++){
-	    elements[i].className = 'aa';
+	var inputs = document.getElementsByTagName("input"), item; 
+	for (var i = 0, len = inputs.length; i < len; i++) { 
+	    item = inputs[i];
+	    if (item.id && item.id.indexOf("frm-formReserve-den-") == 0) { 
+		// item.id starts with frm-formReserve-den-
+		item.disabled = false;
+	    }
+	} 
+	var elements = document.querySelectorAll('.disable');
+	var pocet = elements.length;
+	for (var i=0; i<pocet;i++){
+	    elements.item(i).className = '';
 	}
-		document.getElementById('casDo').className = 'sss';
-		var aaa;
-
+	//disable prvky
+	document.getElementById('denOd').disabled = true;
+	document.getElementById('denOd').className = 'disable';
+	document.getElementById('denDo').disabled = true;
+	document.getElementById('denDo').className = 'disable';
+//	document.getElementById('rezSingle').className='visible';
+//	document.getElementById('rezMulti').className='hidden';
+	
     }
 }
 </script>
+*}

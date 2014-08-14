@@ -156,11 +156,16 @@ textarea:focus, input[type="login"]:focus, input[type="text"]:focus, input[type=
 }
 
 textarea.disable , select.disable , input.disable {
-
-	border: 1px solid red; 
+	background-color: #848484;
 	-webkit-border-radius: 5px; 
 	-moz-border-radius: 5px; 
 	border-radius: 5px; 
 	outline:0; 
 	height:25px; 
+}
+.hidden {
+    display: none;
+}
+.visible {
+    display: block;
 }

@@ -20,9 +20,7 @@ class HelpPresenter extends BasePresenter
     public function actionDefault($filename)
     {
 	Debugger::fireLog('Action');
-	/* Response pro stažení*/
-//	$this->sendResponse(new Responses\FileResponse($this->context->parameters['wwwDir'].'/files/help.pdf', 'Nápověda.pdf', 'application/pdf'));
-	/* Response pro otevření*/
-	$this->sendResponse(new PdfResponse($this->context->parameters['wwwDir'].'/files/help.pdf', 'Nápověda.pdf', 'application/pdf'));
+	/* Response pro zobrazení, pro stažení poslední parametr, TRUE*/
+	$this->sendResponse(new Responses\FileResponse($this->context->parameters['wwwDir'].'/files/help.pdf', 'Nápověda.pdf', 'application/pdf', FALSE));
     }
 }
