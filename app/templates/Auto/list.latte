@@ -54,20 +54,20 @@
 
 <h2>Vjezdy pro auta</h2>
 <form n:name=autoExtForm>
-    <p><label n:name=auto_id>Vyber auto <select n:name=auto_id /></label></p>
-    {snippet tabExtCar}
-    <table class='list'>
-        <tr><th>&nbsp;</th><th>Název</th><th>Zkratka</th></tr>
-	    <tr n:foreach="$_form[ext_id]->items as $key => $label" n:class='$iterator->even ? suda:licha'>    
-		<td><label n:name="ext_id:$key"><input n:name="ext_id:$key"> {$label}</label></td>
-		<td>{$externiVjezdy[$key][nazev]}</td>
-		<td>{$externiVjezdy[$key][zkratka]}</td>
-	    </tr>
+    <table class="list">
+        <tr><th>Název Auta</th>{foreach $externiVjezdy as $vjezd}<th>{$vjezd->nazev}</th>{/foreach}</tr>
+        {foreach $auta as $auto}
+            <tr n:class='$iterator->even ? suda:licha'>
+                {? $name = $auto->id}
+                <td>{$auto->spz} - {$auto->znackaAuta->znacka}</td> 
+                {foreach $form[$name]->items as $key => $label}
+                    <td><input n:name="{$name}:$key"> {$label}</td>
+                {/foreach}
+            </tr>
+        {/foreach}    
     </table>
-    {/snippet}
     <p><input n:name=send> </p>
-</form>
-    
+</form>    
 
 <h2>Externí vjezdy</h2>	 
 {snippet editExterniVjezd}
@@ -91,14 +91,5 @@
 
 {define #jsCallback}
 
-$('#{$control["autoExtForm"][$input]->htmlId}').on('change', function() {
-    $.nette.ajax({
-        type: 'GET',
-        url: '{link {$link}!}',
-        data: {
-            'value': $(this).val()
-        }
-    });
-});
 
 {/define}

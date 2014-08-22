@@ -6,7 +6,7 @@
  * @author Petr Stefan
  */
 class Constants {
-    const PROGRAM_VERSION = '1.2';
+    const PROGRAM_VERSION = '1.4';
     const ADMIN_MAIL = 'petr.stefan@vitkovice.cz';
     const ADMIN_NAME = 'Bc. Petr Stefan';
     const DNY_NA_REZERVACI = 14;

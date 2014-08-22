@@ -139,8 +139,6 @@ class AutoPresenter extends SecurePresenter
         $this->template->znacky = $this->auto->vypisZnacky();
         $this->template->typy = $this->auto->vypisTypy();
         $this->template->externiVjezdy = $this->auto->vypisExterniVjezdy();
-	// required to enable form access in snippets
-        $this->template->_form = $this['autoExtForm'];
     }
     
    
@@ -317,33 +315,39 @@ class AutoPresenter extends SecurePresenter
     
     protected function createComponentAutoExtForm()
     {
-	$auta = $this->auto->vypisAuta();
-	foreach ($auta as $auto) {
-	    $autaDetail[$auto->id] = $auto->spz.' - '.$auto->znackaAuta->znacka.' - '.$auto->popis;
-	}
-	$autoId = key($autaDetail); // vyber prvni id
 	$form = new Form;
-	$form->addSelect('auto_id', 'Auto',$autaDetail)
-		->setDefaultValue($autoId);
-	$form->addCheckboxList('ext_id', 'Externí vjezd', $this->auto->vypisExterniVjezdy()->fetchPairs('id', 'nazev'))
-		->setDefaultValue($this->auto->externiVjezdAuta($autoId));
-        $form->addSubmit('send', 'Upravit auta');
-
-        $form->onSuccess[] = $this->processAutoExtForm;
+	$auta = $this->auto->vypisAuta();
+	$vjezdyId = $this->auto->vypisExterniVjezdy()->fetchPairs('id', 'nazev');
+	
+	foreach ($auta as $auto) {
+		$form->addCheckboxList($auto->id, $auto->spz, $vjezdyId)
+		    ->setDefaultValue($auto->related('auto_externiVjezd.auto_id')->fetchPairs(NULL, 'externiVjezd_id'));
+	}
+	$form->addSubmit('send', 'Přidej/edituj');
+	
+	$form->onSuccess[] = $this->autoExtFormSucceeded;
 	return $form;
     }
     
-    public function processAutoExtForm(Form $form)
+    public function autoExtFormSucceeded(Form $form)
     {
         // $form->getValues() ignores invalidated input's values
         $values = $form->getHttpData();
         unset($values['send']);
 	 try {
-		//nejdříve odstraníme všechna auta z útvaru
-		$this->auto->odstranExtAuta($values['auto_id']);
-		// přidáme zaškrtnutá auta, pokud existují
-		if(isset($values['ext_id']))
-		    $this->auto->pridejExtAuta($values['auto_id'], $values['ext_id']);
+		//nejdříve odstraníme všechny záznamy z vazební tabulky
+		$this->auto->odstranExtAuta();
+		// v cyklu přidáme pro jednotlivá auta záznamy
+		$auta = $this->auto->vypisAuta();
+		$vjezdyId = $this->auto->vypisExterniVjezdy()->fetchPairs(NULL, 'id');
+		foreach ($auta as $auto) {
+		    $key = "_".$auto->id;
+		    if(isset($values[$key])){
+			$this->auto->pridejExtAuta($auto->id, $values[$key]);
+		    }
+		}
+		
+		
 		$this->flashMessage('Editace externího vjezu k autu proběhla úspěšně.', 'success');
 		$this->redirect('this', $id = null);
 	}catch (MyExceptions\AddPdoException $e){

@@ -86,9 +86,12 @@ $(function() {
 
 {define trAuto}
 	    <tr>
-                {var $pom = NULL}
+                {var $pom = 'Žádné'}
                {foreach $u->auto->related('auto_externiVjezd') as $ex}
-                  {? $pom .= $ex->externiVjezd->nazev}
+                  {if $iterator->first}
+                      {? $pom = ""}
+                  {/if}
+                   {? $pom .= $ex->externiVjezd->nazev}
                   {if !$iterator->last}
                       {? $pom .= ", "}
                   {/if}

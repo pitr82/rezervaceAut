@@ -201,20 +201,21 @@ class Auto extends \Nette\Object
 	return $dotaz;
     }
     
+       
      public function externiVjezdAuta($autoId) 
     {
 	$auto = $this->database->table('auto')->get($autoId);
 	$externiVjezdy = array();
-	foreach ($auto->related('auto_externiVjezd.externiVjezd_id') as $a){
+	foreach ($auto->related('auto_externiVjezd.auto_id') as $a){
 	    $externiVjezdy[] = $a->externiVjezd_id;
 	}
 	return $externiVjezdy;
     }
     
-    public function odstranExtAuta($autoId)	
+    public function odstranExtAuta()	
     {
 	try {
-	    $this->database->table('auto_externiVjezd')->where('auto_id', $autoId)->delete();
+	    $this->database->table('auto_externiVjezd')->where(true)->delete();
 	} catch (\PDOException $e) {
 	    throw new MyExceptions\DelPdoException("Chyba při odstraňování");
 	}
