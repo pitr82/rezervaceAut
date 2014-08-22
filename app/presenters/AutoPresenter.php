@@ -75,8 +75,8 @@ class AutoPresenter extends SecurePresenter
     
     public function handleEditTyp($id)
     {
-	if($typ = $this->auto->vratTyp($id))
-	    $this['formTyp']->setDefaults($typ);
+	if($vjezdy = $this->auto->vratTyp($id))
+	    $this['formTyp']->setDefaults($vjezdy);
 	if($this->isAjax())
 	    $this->redrawControl('editType');
     }
@@ -97,11 +97,50 @@ class AutoPresenter extends SecurePresenter
 	$this->redirect('this', $id = null);
     }
     
+    public function handleEditExterniVjezd($id)
+    {
+	if($typ = $this->auto->vratExterniVjezd($id))
+	    $this['formExterniVjezd']->setDefaults($typ);
+	if($this->isAjax())
+	    $this->redrawControl('editExterniVjezd');
+    }
+    
+    public function handleDeleteExterniVjezd($id)
+    {
+	try {
+	    
+	    if($this->auto->smazExterniVjezd($id)){
+		$this->flashMessage('Externi vjezd byl úspěšně odstraněn.', 'success');
+	    }else{
+		$this->flashMessage('Externi vjezd nemohl být odstraněn.', 'error');
+	    }
+	} catch (MyExceptions\IntegrityConstraintException $ex) {
+	    $this->flashMessage('Externi vjezd nemohl byt odstraněn: '.$ex->getMessage(), 'error');
+	}
+	$this->redirect('this', $id = null);
+    }
+    
 
+    public function handleAutoExtForm($value)
+    {
+        if ($value) {
+            $this['autoExtForm']['ext_id']
+                ->setItems($this->auto->vypisExterniVjezdy()->fetchPairs('id', 'nazev'))
+		->setDefaultvalue($this->auto->externiVjezdAuta($value));
+        } else {
+            $this['autoExtForm']['ext_id']->setItems(array());
+        }
+        $this->redrawControl('tabExtCar');
+    }
+    
+    
     public function renderList($id) {
         $this->template->auta = $this->auto->vypisAuta();
         $this->template->znacky = $this->auto->vypisZnacky();
         $this->template->typy = $this->auto->vypisTypy();
+        $this->template->externiVjezdy = $this->auto->vypisExterniVjezdy();
+	// required to enable form access in snippets
+        $this->template->_form = $this['autoExtForm'];
     }
     
    
@@ -232,4 +271,86 @@ class AutoPresenter extends SecurePresenter
 	    }
 	}
     }
+    
+    protected function createComponentFormExterniVjezd() 
+    {
+	$form = new Form;
+	$form->addText('nazev', 'Název')
+		->setRequired('Nezadali jste název pro externí vjezd.')
+		->setAttribute('placeholder', 'Externí vjezd');
+	$form->addText('zkratka', 'Zkratka')
+		->setRequired('Nezadali jste zkratku pro externí vjezd.')
+		->setAttribute('placeholder', 'Zkratka externího vjezdu');
+	$form->addSubmit('send', 'Přidej/edituj');
+	
+	$form->onSuccess[] = $this->formExterniVjezdSucceeded;
+	return $form;
+    }
+    
+    public function formExterniVjezdSucceeded($form)
+    {
+	$id = $this->getParameter('id');
+	if(!$id){
+	    // přidávání do databáze
+	    try {
+		$this->auto->addExterniVjezd($form->getValues());
+		$this->flashMessage('Přidání externího vjezdu proběho úspěšně.', 'success');
+		$this->redirect('this');
+	    }catch (MyExceptions\UniqueColumnException $e){
+		$this->flashMessage('Externí vjezd nemohl byt přidán. '.$e->getMessage(), 'error');
+		$form->render($form['nazev']->getControlPrototype()->addClass('error'));
+		$form->render($form['zkratka']->getControlPrototype()->addClass('error'));
+	    }
+	}else{
+	    //editace - update v databázi
+	    try {
+		$this->auto->editExterniVjezd($form->getValues(), $id);
+		$this->flashMessage('Editace externího vjezdu proběhla úspěšně.', 'success');
+		//vymažeme id
+		$this->redirect('this', $id = null);
+	    }catch (MyExceptions\UniqueColumnException $e){
+		$this->flashMessage('Při editaci externího vjezdu nastala chyba. '.$e->getMessage(), 'error');
+	    }
+	}
+    }
+    
+    
+    protected function createComponentAutoExtForm()
+    {
+	$auta = $this->auto->vypisAuta();
+	foreach ($auta as $auto) {
+	    $autaDetail[$auto->id] = $auto->spz.' - '.$auto->znackaAuta->znacka.' - '.$auto->popis;
+	}
+	$autoId = key($autaDetail); // vyber prvni id
+	$form = new Form;
+	$form->addSelect('auto_id', 'Auto',$autaDetail)
+		->setDefaultValue($autoId);
+	$form->addCheckboxList('ext_id', 'Externí vjezd', $this->auto->vypisExterniVjezdy()->fetchPairs('id', 'nazev'))
+		->setDefaultValue($this->auto->externiVjezdAuta($autoId));
+        $form->addSubmit('send', 'Upravit auta');
+
+        $form->onSuccess[] = $this->processAutoExtForm;
+	return $form;
+    }
+    
+    public function processAutoExtForm(Form $form)
+    {
+        // $form->getValues() ignores invalidated input's values
+        $values = $form->getHttpData();
+        unset($values['send']);
+	 try {
+		//nejdříve odstraníme všechna auta z útvaru
+		$this->auto->odstranExtAuta($values['auto_id']);
+		// přidáme zaškrtnutá auta, pokud existují
+		if(isset($values['ext_id']))
+		    $this->auto->pridejExtAuta($values['auto_id'], $values['ext_id']);
+		$this->flashMessage('Editace externího vjezu k autu proběhla úspěšně.', 'success');
+		$this->redirect('this', $id = null);
+	}catch (MyExceptions\AddPdoException $e){
+		$this->flashMessage('Při úpravě externích vjezdu nastala chyba.'.$e->getMessage(), 'error');
+	}catch (MyExceptions\DelPdoException $e){
+		$this->flashMessage('Při úpravě externích vjezdu nastala chyba.'.$e->getMessage(), 'error');
+	}
+    }
+    
 }

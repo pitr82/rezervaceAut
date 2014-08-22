@@ -52,17 +52,53 @@
 {control formZnacka}
 {/snippet}
 
+<h2>Vjezdy pro auta</h2>
+<form n:name=autoExtForm>
+    <p><label n:name=auto_id>Vyber auto <select n:name=auto_id /></label></p>
+    {snippet tabExtCar}
+    <table class='list'>
+        <tr><th>&nbsp;</th><th>Název</th><th>Zkratka</th></tr>
+	    <tr n:foreach="$_form[ext_id]->items as $key => $label" n:class='$iterator->even ? suda:licha'>    
+		<td><label n:name="ext_id:$key"><input n:name="ext_id:$key"> {$label}</label></td>
+		<td>{$externiVjezdy[$key][nazev]}</td>
+		<td>{$externiVjezdy[$key][zkratka]}</td>
+	    </tr>
+    </table>
+    {/snippet}
+    <p><input n:name=send> </p>
+</form>
+    
 
-
-<h2>Typ automobilů</h2>	 
-{snippet editType}
+<h2>Externí vjezdy</h2>	 
+{snippet editExterniVjezd}
 <table class='list'>
-    <tr><th>Typ automobilu</th><th>Editovat</th><th>Odstranit</th></tr>
-    <tr n:foreach="$typy as $typ" n:class='$iterator->even ? suda:licha'> 
-	    <td>{$typ->typ}</td>
-	    <td><a class='ajax' href="{link editTyp!,$typ->id}">Editovat</a></td>
-	    <td><a class='delete' href="{link deleteTyp!,$typ->id}">Odstranit</a></td>
+    <tr><th>Externí vjezd</th><th>Zkratka</th><th>Editovat</th><th>Odstranit</th></tr>
+    <tr n:foreach="$externiVjezdy as $externiVjezd" n:class='$iterator->even ? suda:licha'> 
+	    <td>{$externiVjezd->nazev}</td>
+	    <td>{$externiVjezd->zkratka}</td>
+	    <td><a class='ajax' href="{link editExterniVjezd!,$externiVjezd->id}">Editovat</a></td>
+	    <td><a class='delete' href="{link deleteExterniVjezd!,$externiVjezd->id}">Odstranit</a></td>
     </tr>
 </table>
-{control formTyp}
+{control formExterniVjezd}
 {/snippet}
+
+<script>
+{include #jsCallback, input => auto_id, link => autoExtForm}
+</script>
+
+{/block}
+
+{define #jsCallback}
+
+$('#{$control["autoExtForm"][$input]->htmlId}').on('change', function() {
+    $.nette.ajax({
+        type: 'GET',
+        url: '{link {$link}!}',
+        data: {
+            'value': $(this).val()
+        }
+    });
+});
+
+{/define}
