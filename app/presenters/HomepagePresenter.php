@@ -55,7 +55,7 @@ class HomepagePresenter extends BasePresenter
 		if ($values->remember) {
 			$this->getUser()->setExpiration('14 days', FALSE);
 		} else {
-			$this->getUser()->setExpiration('1 minutes', TRUE);
+			$this->getUser()->setExpiration('15 minutes', TRUE);
 		}
 
 		try {
