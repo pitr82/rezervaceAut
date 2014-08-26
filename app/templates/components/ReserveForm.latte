@@ -20,7 +20,7 @@
 	    </td>
 	    {capture $zamestnanec} {$rezervace->zamestnanec->prijmeni} {$rezervace->zamestnanec->jmeno} {/capture}
 	    <td class='rezervace'>{$rezervace->rezervaceOd|date:'H:i'} - {$rezervace->rezervaceDo|date:'H:i'}
-	    <a href="mailto:{$rezervace->zamestnanec->email}">{$zamestnanec|subStr:14}</a></td>
+	    <a href="mailto:{$rezervace->zamestnanec->email}">{$zamestnanec|subStr:13}</a></td>
 	</tr>
     </table>
     <div class="navigace">

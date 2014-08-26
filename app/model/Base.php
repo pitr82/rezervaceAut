@@ -63,11 +63,26 @@ class Base extends Nette\Object{
 	    return $this->database->table('utvar')->order('nazev');
     }
     
+     /**
+     * Funkce pro vráceni výpisu zamestnance (vytváří se jen jednou)
+     * 
+     * @return object
+     */
+    public function vypisZamestnance($userId) 
+    {
+	if (!isset($this->services['vypisZamestnance'])) {
+            $this->services['vypisZamestnance'] = $this->createVypisZamestnance($userId);
+        }
+        return $this->services['vypisZamestnance'];
+    }
    
+    public function createVypisZamestnance($userId) {
+	return $this->database->table('zamestnanec')->get($userId);
+    }
    
     public function checkUser($userId)
     {
-	$zamestnanec = $this->database->table('zamestnanec')->get($userId);
+	$zamestnanec = $this->vypisZamestnance($userId);
 	if($zamestnanec->povolen == 0 || $zamestnanec->zruseno == 1)
 	    return false;
 	else
@@ -76,10 +91,11 @@ class Base extends Nette\Object{
     
     public function onlineUpdate($userId)
     {
-	$this->database->table('zamestnanec')->where('id', $userId)->update(array('online' => $this->database->literal("NOW()")));
+	$zamestnanec = $this->vypisZamestnance($userId);
+	$zamestnanec->update(array('online' => $this->database->literal('NOW()')));
     }
     
-    public function onlioneShow() {
+    public function onlineShow() {
 	return $this->database->table('zamestnanec')->where('`online` >= DATE_SUB(NOW(), INTERVAL ? MINUTE)', 5);
     }
     

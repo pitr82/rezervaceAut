@@ -30,7 +30,9 @@ class SecurePresenter extends BasePresenter
 	}else{
 	    $this->base->onlineUpdate($this->user->getId());
 	    // povinný parametr po přihlášení
-	    $this->template->onlineUsers = $this->base->onlioneShow()->fetchALl();
+	    barDump($this->base->onlineShow()) ;
+	    $this->template->onlineUsers = $this->base->onlineShow();
+	    
 	}
     }
 }

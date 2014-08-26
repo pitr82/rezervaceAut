@@ -103,7 +103,9 @@
 	<div id="content">
 	    <div id="prihlasovani">
                 <div id="logged-in" n:if="$user->loggedIn">Vítejte: <strong>{$user->identity->jmeno} {$user->identity->prijmeni}</strong> <a n:href="Homepage:out"> Odhlásit se</a><br />
-                    Online uživatelů: {ifset $onlineUsers}  <strong>{count($onlineUsers)}</strong>{/ifset} 
+                    {ifset $onlineUsers}  
+                    Online uživatelů:
+                    <strong>{count($onlineUsers)}</strong>
                     {var $users = null}
                     {foreach $onlineUsers as $ou}
                     {? $users .= $ou->jmeno." ".$ou->prijmeni}
@@ -112,6 +114,8 @@
                     {/if} 
                     {/foreach}
                     <img class="info" src="{$basePath}/images/users.png" title="{$users}" alt="Seznam online uživatelů">
+                    {/ifset} 
+                    
                 </div>
 		{block prihlasovani}
 		{/block}
