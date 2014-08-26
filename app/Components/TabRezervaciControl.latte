@@ -12,15 +12,7 @@
     table.rezervace .bublina span { display: none; }
     table.rezervace .bublina:hover span { display: block; position: absolute; top: 1em; left: 2em; padding: 0.2em 0.5em; 
 			    border: 1px solid #0c2f52; background-color: #0f5091; text-decoration: none; color: white; z-index: 5; min-width: 200px; }
-    img.info { margin-left: 5px; vertical-align: middle }
-    .ui-tooltip, .arrow:after { background: black; border: 1px solid white; }
-    .ui-tooltip { padding: 7px 15px; color: white; border-radius: 10px; font: bold 9px "Helvetica Neue", Sans-Serif; box-shadow: 0 0 5px black; }
-    .arrow { width: 70px; height: 16px; overflow: hidden; position: absolute; left: 50%; margin-left: -35px; bottom: -16px; }
-    .arrow.top { top: -16px; bottom: auto; }
-    .arrow.left { left: 20%; }
-    .arrow:after { content: ""; position: absolute; left: 20px; top: -20px; width: 25px; height: 25px;
-                    box-shadow: 6px 5px 9px -9px black; -webkit-transform: rotate(45deg); -ms-transform: rotate(45deg); transform: rotate(45deg); }
-    .arrow.top:after { bottom: -20px; top: auto; }
+    
 </style>
 {*cache $den, expire => '10 seconds'*}
 <table class="rezervace">
@@ -49,26 +41,6 @@
     {/if}
 </table>
     
-<script>
-$(function() {
-    $( document ).tooltip({
-        items: "img, a", 
-        position: {
-            my: "center bottom-20",
-            at: "center top",
-            using: function( position, feedback ) {
-                $( this ).css( position );
-                $( "<div>" )
-                .addClass( "arrow" )
-                .addClass( feedback.vertical )
-                .addClass( feedback.horizontal )
-                .appendTo( this );
-            }
-        }
-    });
-});
-</script>
-
 {*/cache*}
 
 {define trCas}

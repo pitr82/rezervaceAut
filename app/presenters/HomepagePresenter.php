@@ -10,7 +10,9 @@ use Nette,
  */
 class HomepagePresenter extends BasePresenter
 {
-       
+    /** @persistent */
+    public $backlink = '';      
+    
     public function renderDefault()
     {	
     }
@@ -53,12 +55,16 @@ class HomepagePresenter extends BasePresenter
 		if ($values->remember) {
 			$this->getUser()->setExpiration('14 days', FALSE);
 		} else {
-			$this->getUser()->setExpiration('20 minutes', TRUE);
+			$this->getUser()->setExpiration('15 minutes', TRUE);
 		}
 
 		try {
 			$this->getUser()->login($values->username, $values->password);
+			/* pokud uživatel byl odhlášen za inaktivitu, tak přeeměrovat zpět */
+			$this->restoreRequest($this->backlink);
 			$this->redirect('Reserve:default', array('datum' => date('Y-m-d')) );
+
+			
 
 		} catch (Nette\Security\AuthenticationException $e) {
 			$form->addError($e->getMessage());

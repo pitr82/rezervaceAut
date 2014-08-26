@@ -73,4 +73,14 @@ class Base extends Nette\Object{
 	else
 	    return true;
     }
+    
+    public function onlineUpdate($userId)
+    {
+	$this->database->table('zamestnanec')->where('id', $userId)->update(array('online' => $this->database->literal("NOW()")));
+    }
+    
+    public function onlioneShow() {
+	return $this->database->table('zamestnanec')->where('`online` >= DATE_SUB(NOW(), INTERVAL ? MINUTE)', 5);
+    }
+    
 }

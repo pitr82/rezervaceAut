@@ -8,7 +8,7 @@ use Nette;
  *
  * @author Petr Stefan
  */
-class SecurePresenter  extends BasePresenter
+class SecurePresenter extends BasePresenter
 {
     
     public function startup() {
@@ -26,6 +26,11 @@ class SecurePresenter  extends BasePresenter
 	    $this->flashMessage('Byli jste automaticky odhlášení z důvodu zablokování.');
 	    $this->user->logout();
 	    $this->redirect('Homepage:', array('backlink' => $this->storeRequest()));
+	/* pokud je vše v pořádku*/	    
+	}else{
+	    $this->base->onlineUpdate($this->user->getId());
+	    // povinný parametr po přihlášení
+	    $this->template->onlineUsers = $this->base->onlioneShow()->fetchALl();
 	}
     }
 }

@@ -202,7 +202,7 @@ class Reserve extends Base{
 			    ->addTo($nasledujiciRezervace->zamestnanec->email)
 			    ->setSubject('Vyzvednutí auta')
 			    ->setHtmlBody($template);
-		    $this->mailer->send($mail);
+    		    $this->mailer->send($mail);
 		}
 	    }	
 	    /* pro update si zvolíme novou proměnnou, abychom si nesmazali půvorní data pro odeslání emailu */
